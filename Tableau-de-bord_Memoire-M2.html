@@ -144,9 +144,11 @@
   </header>
   <div class="toolbar">
     <button class="btn primary" onclick="window.print()">📄 Exporter en PDF</button>
-    <button class="btn" onclick="exportData()">💾 Exporter mes données</button>
+    <button class="btn" onclick="exportData()">💾 Télécharger JSON</button>
+    <button class="btn" onclick="shareData()">📤 Partager / Dropbox</button>
+    <button class="btn" onclick="copyData()">📋 Copier JSON</button>
     <button class="btn" onclick="document.getElementById('importFile').click()">📥 Importer</button>
-    <input type="file" id="importFile" accept="application/json" style="display:none" onchange="importData(this)">
+    <input type="file" id="importFile" accept=".json,application/json,text/plain" style="display:none" onchange="importData(this)">
     <button class="btn" onclick="resetAll()">↺ Réinitialiser</button>
   </div>
   <div class="hintbar">✏️ Double-clique un texte pour le modifier · clique un statut pour le changer · ✕ pour supprimer · « + » pour ajouter · 💾 sauvegarde / transfert entre appareils</div>
@@ -181,35 +183,36 @@ const COLORS={Cadrage:{c:'#bfe3c4',c2:'#5a9e6e'},Indice:{c:'#f9cba8',c2:'#c9823f
 const NAMES={Cadrage:"① Cadrage & concepts",Indice:"② Indice de difficulté",Accès:"③ Accès & encadrement",Sources:"④ Sources & biblio",Rédaction:"⑤ Rédaction"};
 const ALLGROUPS=["Cadrage","Indice","Accès","Sources","Rédaction"];
 let GROUPS=ALLGROUPS.slice();
-const CYCLE=["À faire","En cours","En attente","À décider","Idée","Validé","Terminé","Écarté"];
-const DONE=["Terminé","Validé"];
-const SKLASS={"Terminé":"s-done","Validé":"s-done","En cours":"s-prog","En attente":"s-wait","À décider":"s-wait","À faire":"s-todo","Idée":"s-idea","Écarté":"s-skip"};
+const CYCLE=["À faire","En cours","Validé"];
+const DONE=["Validé"];
+const SKLASS={"Validé":"s-done","En cours":"s-prog","À faire":"s-todo"};
+const STATUS_MAP={"Terminé":"Validé","Validé":"Validé","En cours":"En cours","En attente":"En cours","À décider":"En cours","À faire":"À faire","Idée":"À faire","Écarté":"À faire"};
 const DEFAULT={
  tasks:[
-  {g:"Cadrage",t:"Sujet, problématique, variable (horloge t0→t1)",s:"Terminé"},
-  {g:"Cadrage",t:"Proposition réfutable (Davis) + distinction difficulté/dispositif",s:"Terminé"},
-  {g:"Cadrage",t:"Typologie des 4 cécités",s:"Terminé"},
-  {g:"Cadrage",t:"Angle longitudinal 2007→2026 (DACG / Dallest)",s:"Terminé"},
-  {g:"Cadrage",t:"Fil conducteur Pinatel / Bauer",s:"Terminé"},
+  {g:"Cadrage",t:"Sujet, problématique, variable (horloge t0→t1)",s:"Validé"},
+  {g:"Cadrage",t:"Proposition réfutable (Davis) + distinction difficulté/dispositif",s:"Validé"},
+  {g:"Cadrage",t:"Typologie des 4 cécités",s:"Validé"},
+  {g:"Cadrage",t:"Angle longitudinal 2007→2026 (DACG / Dallest)",s:"Validé"},
+  {g:"Cadrage",t:"Fil conducteur Pinatel / Bauer",s:"Validé"},
   {g:"Indice",t:"D1 — Contrainte spatiale (nb de communes)",s:"Validé"},
   {g:"Indice",t:"D2 — Contrainte temporelle (ancienneté du fait le + ancien)",s:"Validé"},
   {g:"Indice",t:"D3 — Variabilité du MO (lieu + moyen)",s:"Validé"},
-  {g:"Indice",t:"D4 — Qualité des traces (hors SALVAC → argument de thèse)",s:"Écarté"},
-  {g:"Indice",t:"D5 — Nombre de victimes (circulaire)",s:"Écarté"},
-  {g:"Indice",t:"Figer la grille de cotation 0/1/2",s:"Terminé"},
+  {g:"Indice",t:"D4 — Qualité des traces (hors SALVAC → argument de thèse)",s:"À faire"},
+  {g:"Indice",t:"D5 — Nombre de victimes (circulaire)",s:"À faire"},
+  {g:"Indice",t:"Figer la grille de cotation 0/1/2",s:"Validé"},
   {g:"Indice",t:"Construire les vignettes (cas fictifs)",s:"En cours"},
   {g:"Indice",t:"Pilote kappa inter-codeurs (script Python)",s:"À faire"},
-  {g:"Accès",t:"Projet de recherche envoyé au directeur pressenti",s:"Terminé"},
-  {g:"Accès",t:"Relance directeur pressenti (si silence)",s:"En attente"},
-  {g:"Accès",t:"Attribution du directeur par le CNAM (octobre)",s:"En attente"},
+  {g:"Accès",t:"Projet de recherche envoyé au directeur pressenti",s:"Validé"},
+  {g:"Accès",t:"Relance directeur pressenti (si silence)",s:"En cours"},
+  {g:"Accès",t:"Attribution du directeur par le CNAM (octobre)",s:"En cours"},
   {g:"Accès",t:"Contact accès données SALVAC",s:"En cours"},
   {g:"Accès",t:"Vérifier : lieu (commune) + dates exploitables dans SALVAC",s:"À faire"},
   {g:"Accès",t:"Vérifier : horodatages t0 / t1 extractibles",s:"À faire"},
   {g:"Sources",t:"Bibliographie consolidée (+ Marin 2003, Davies 2018)",s:"En cours"},
   {g:"Sources",t:"Margot 2009 (via Davies uniquement)",s:"En cours"},
-  {g:"Sources",t:"Sources Chopin & Aebi (accès OCRVP, biais 71,64 %)",s:"Terminé"},
-  {g:"Rédaction",t:"Introduction (propos liminaires)",s:"Terminé"},
-  {g:"Rédaction",t:"Plan détaillé (3 parties, fil Bauer, grille CNAM)",s:"Terminé"},
+  {g:"Sources",t:"Sources Chopin & Aebi (accès OCRVP, biais 71,64 %)",s:"Validé"},
+  {g:"Rédaction",t:"Introduction (propos liminaires)",s:"Validé"},
+  {g:"Rédaction",t:"Plan détaillé (3 parties, fil Bauer, grille CNAM)",s:"Validé"},
   {g:"Rédaction",t:"Partie I — Dispositifs & cécités (rédigeable maintenant)",s:"À faire"},
   {g:"Rédaction",t:"Partie II — Construire la mesure",s:"À faire"},
   {g:"Rédaction",t:"Partie III — Faisabilité, résultats, discussion",s:"À faire"},
@@ -242,6 +245,7 @@ function normalize(){
   if(!STATE.months)STATE.months=JSON.parse(JSON.stringify(DEFAULT.months));
   if(!STATE.milestones)STATE.milestones=JSON.parse(JSON.stringify(DEFAULT.milestones));
   if(!STATE.next)STATE.next=JSON.parse(JSON.stringify(DEFAULT.next));
+  STATE.tasks.forEach(function(d){d.s=STATUS_MAP[d.s]||(CYCLE.indexOf(d.s)>=0?d.s:"À faire");});
 }
 function load(){
   try{const s=localStorage.getItem(KEY);STATE=s?JSON.parse(s):JSON.parse(JSON.stringify(DEFAULT));}
@@ -251,15 +255,44 @@ function load(){
 function save(){try{STATE.lastVisit=new Date().toISOString();localStorage.setItem(KEY,JSON.stringify(STATE));}catch(e){}}
 function flashSaved(){const n=document.getElementById('savedNote');n.textContent="✓ enregistré";clearTimeout(window._t);window._t=setTimeout(()=>n.textContent="",1400);}
 
+function getJson(){save();return JSON.stringify(STATE,null,2);}
+function fileName(){return "suivi-memoire_"+new Date().toISOString().slice(0,10)+".json";}
 function exportData(){
-  save();
-  const data=JSON.stringify(STATE,null,2);
+  const data=getJson();
   const blob=new Blob([data],{type:"application/json"});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
-  const d=new Date().toISOString().slice(0,10);
-  a.href=url;a.download="suivi-memoire_"+d+".json";a.click();
-  URL.revokeObjectURL(url);
+  a.href=url;a.download=fileName();
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(function(){URL.revokeObjectURL(url);},1500);
+}
+async function copyData(){
+  const data=getJson();
+  try{
+    await navigator.clipboard.writeText(data);
+    alert("JSON copié. Colle-le dans Dropbox, Drive, Keep ou un mail.");
+  }catch(e){
+    prompt("Sélectionne tout et copie :", data);
+  }
+}
+async function shareData(){
+  const data=getJson();
+  const name=fileName();
+  const file=new File([data],name,{type:"application/json"});
+  try{
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      await navigator.share({title:"Suivi mémoire M2",text:"Sauvegarde tableau de bord",files:[file]});
+      return;
+    }
+    if(navigator.share){
+      await navigator.share({title:"Suivi mémoire M2",text:data});
+      return;
+    }
+  }catch(e){
+    if(e && e.name==="AbortError") return;
+  }
+  exportData();
+  alert("Si le bouton était gris : le fichier est téléchargé.\nEnsuite ouvre Dropbox → Importer / Enregistrer dans Dropbox.");
 }
 function importData(input){
   const file=input.files[0];if(!file)return;
@@ -283,7 +316,7 @@ function render(){
   const cont=document.getElementById('chantiers');cont.innerHTML="";
   GROUPS.forEach(g=>{
     const items=STATE.tasks.filter(d=>d.g===g);
-    const counted=items.filter(d=>d.s!=="Écarté"&&d.s!=="Idée");
+    const counted=items;
     const done=counted.filter(d=>DONE.includes(d.s)).length;
     const pct=counted.length?Math.round(done/counted.length*100):0;
     const co=COLORS[g];
@@ -293,8 +326,7 @@ function render(){
       <div class="bar"><span style="width:${pct}%"></span></div><div class="tasks">`;
     items.forEach(d=>{
       const idx=STATE.tasks.indexOf(d);
-      const skip=(d.s==="Écarté")?" is-skip":"";
-      html+=`<div class="task${skip}">
+      html+=`<div class="task">
         <span class="lbl" data-i="${idx}" ondblclick="editTask(this,${idx})" title="Double-clique pour modifier">${escapeHtml(d.t)}</span>
         <button class="st ${SKLASS[d.s]||'s-todo'}" onclick="cycle(${idx})">${d.s}</button>
         <button class="del" onclick="delTask(${idx})" title="Supprimer">✕</button></div>`;
@@ -302,7 +334,7 @@ function render(){
     html+=`</div><button class="addbtn" onclick="addTask('${g}')">+ ajouter une tâche</button>`;
     div.innerHTML=html;cont.appendChild(div);
   });
-  const counted=STATE.tasks.filter(d=>d.s!=="Écarté"&&d.s!=="Idée");
+  const counted=STATE.tasks;
   const done=counted.filter(d=>DONE.includes(d.s)).length;
   const gpct=counted.length?Math.round(done/counted.length*100):0;
   document.getElementById('ring').style.setProperty('--p',gpct);
@@ -310,11 +342,9 @@ function render(){
   const cnt=s=>STATE.tasks.filter(d=>d.s===s).length;
   const nd=STATE.tasks.filter(d=>DONE.includes(d.s)).length;
   document.getElementById('pills').innerHTML=
-    `<span class="pill k-done">${nd} terminé / validé</span>
+    `<span class="pill k-done">${nd} validé</span>
      <span class="pill k-prog">${cnt("En cours")} en cours</span>
-     <span class="pill k-wait">${cnt("En attente")+cnt("À décider")} en attente / à décider</span>
-     <span class="pill k-todo">${cnt("À faire")} à faire</span>
-     <span class="pill k-skip">${cnt("Écarté")+cnt("Idée")} écarté / idée</span>`;
+     <span class="pill k-todo">${cnt("À faire")} à faire</span>`;
   const nl=document.getElementById('nextlist');nl.innerHTML="";
   STATE.next.forEach((txt,i)=>{
     nl.innerHTML+=`<div class="step"><span class="num">${i+1}</span>
@@ -366,7 +396,7 @@ function editDate(i){
   if(v!==null&&v!==""){const num=parseFloat(v.replace(',','.'));if(!isNaN(num)&&num>=0&&num<STATE.months.length){STATE.milestones[i].m=num;save();renderTimeline();}}
 }
 function escapeHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function cycle(i){const c=CYCLE.indexOf(STATE.tasks[i].s);STATE.tasks[i].s=CYCLE[(c+1)%CYCLE.length];save();render();}
+function cycle(i){const cur=STATUS_MAP[STATE.tasks[i].s]||STATE.tasks[i].s;const c=CYCLE.indexOf(cur);STATE.tasks[i].s=CYCLE[(c<0?0:c+1)%CYCLE.length];save();render();}
 function delTask(i){if(confirm("Supprimer cette ligne ?\n\n« "+STATE.tasks[i].t+" »")){STATE.tasks.splice(i,1);save();render();}}
 function addTask(g){STATE.tasks.push({g:g,t:"Nouvelle tâche",s:"À faire"});save();render();
   setTimeout(()=>{const spans=[...document.querySelectorAll('.lbl')];const last=spans.reverse().find(s=>STATE.tasks[+s.dataset.i].g===g&&STATE.tasks[+s.dataset.i].t==="Nouvelle tâche");if(last)editTask(last,+last.dataset.i);},50);}
