@@ -12,7 +12,7 @@
   <meta name="theme-color" content="#c3ade4">
 
 <style>
-  :root{
+  :root{a
     --pinkbg:#fdeef3;--peachbg:#fdf1e8;--yellowbg:#fdfae8;--greenbg:#eef8ef;--bluebg:#ecf5fb;--purplebg:#f4eefb;
     --ink:#5a5566;--soft:#9a93a6;--line:#efe9f2;
     --doneink:#3f7d53;--progink:#a86a1e;--waitink:#b34659;--todoink:#3f6f92;--ideaink:#6f4ea8;--skipink:#88818f;
@@ -123,6 +123,24 @@
   .tl-del{position:absolute;top:-6px;right:14px;background:#fff;border:1px solid #f0d4da;color:#d98a98;width:18px;height:18px;border-radius:50%;font-size:11px;line-height:1;cursor:pointer;opacity:0;transition:opacity .2s;display:flex;align-items:center;justify-content:center}
   .tl-ms:hover .tl-del{opacity:1}.tl-del:hover{background:#fbeceb;color:#c0392b}
   .d-done{background:#7cc492}.d-prog{background:#f2b56b}.d-wait{background:#ef9aa8}.d-todo{background:#9dc4e0}.d-key{background:#c3ade4}.d-crit{background:#e8607a;box-shadow:0 0 0 4px rgba(232,96,122,.18),0 2px 6px rgba(150,120,160,.3)}
+
+  /* ===== COMPTEUR DE TEMPS ===== */
+  .hours{padding:20px 24px;margin-bottom:20px}
+  .hours-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;padding-right:30px}
+  .hours-head h3{font-size:15px;font-weight:800;color:#8a6d1f}
+  .hours-total{font-size:34px;font-weight:800;color:#c9823f;margin:2px 0 2px}
+  .hours-total .base{font-size:14px;font-weight:700;color:#b39a33;cursor:pointer;border-bottom:1px dashed #e0cf8a}
+  .hours-hint{font-size:11px;color:var(--soft);font-style:italic;margin-bottom:12px}
+  .sess{display:flex;align-items:center;gap:10px;font-size:13px;padding:5px 6px;border-radius:9px}
+  .sess:hover{background:rgba(255,255,255,.55)}
+  .sess .sdate{width:92px;color:#8a6d1f;font-weight:700;cursor:text;padding:2px 4px;border-radius:5px}
+  .sess .sdur{width:64px;text-align:right;font-weight:800;color:#c9823f;cursor:text;padding:2px 4px;border-radius:5px}
+  .sess .snote{flex:1;color:var(--ink);cursor:text;padding:2px 6px;border-radius:5px}
+  .sess [contenteditable="true"]:focus{outline:2px solid #f0d79a;background:#fff}
+  .sess .sdel{background:none;border:none;color:#e0a9b4;font-size:15px;cursor:pointer;opacity:.5;padding:0 4px}
+  .sess:hover .sdel{opacity:1}.sess .sdel:hover{color:#c0392b}
+  @media print{.hours-head .tl-add,.hours-hint,.sess .sdel{display:none!important}}
+
   @media print{.tl-add,.tl-del,.tl-hint{display:none!important}.tl-scroll{overflow:visible}.tl-track{min-width:0}}
   @media print{
     body{background:#fff!important;padding:0;color:#333}
@@ -166,7 +184,14 @@
   </div>
   <div class="card-base global">
     <div class="ring" id="ring"><b id="ringPct">0%</b><small>ACHEVÉ</small></div>
-    <div class="gtext"><h2>Où j'en suis, globalement</h2><div class="pills" id="pills"></div></div>
+    <div class="gtext"><h2>Ma progression</h2><div class="pills" id="pills"></div></div>
+  </div>
+  <div class="card-base hours" id="hoursCard">
+    <div class="hours-head"><h3>⏱️ Temps investi</h3><button class="tl-add" onclick="addSession()">+ session</button></div>
+    <div class="hours-total"><span id="hoursTotal">—</span> <span style="font-size:16px;color:#b39a33">h</span></div>
+    <div class="hours-hint">Estimation de départ (double-clique le « base » pour l'ajuster). Ajoute ensuite tes sessions : date + durée (en heures) + note.</div>
+    <div id="sessionsList"></div>
+    <button class="blockdel" title="Supprimer ce bloc" onclick="delBlock('hours','Temps investi')" style="top:14px;right:16px">✕</button>
   </div>
   <h4 class="section">Avancement par chantier</h4>
   <div id="chantiers"></div>
@@ -217,6 +242,7 @@ const DEFAULT={
   {g:"Rédaction",t:"Conclusion & recommandations",s:"À faire"},
  ],
  focus:"",
+hours:{base:25,sessions:[]},
  next:["Poursuivre les vignettes discordantes (score-first + re-cotation) jusqu'à ~10 cas.",
        "Commencer la rédaction de la Partie I — documentaire et juridique, aucun accès requis.",
        "Récupérer le calendrier CNAM (24 sept.) et caler les dates du rétroplanning."],
@@ -243,6 +269,8 @@ function normalize(){
   if(!STATE.months)STATE.months=JSON.parse(JSON.stringify(DEFAULT.months));
   if(!STATE.milestones)STATE.milestones=JSON.parse(JSON.stringify(DEFAULT.milestones));
   if(!STATE.next)STATE.next=JSON.parse(JSON.stringify(DEFAULT.next));
+  if(!STATE.hours)STATE.hours={base:25,sessions:[]};
+  if(STATE.hidden.hours===undefined)STATE.hidden.hours=false;
   STATE.tasks.forEach(function(d){d.s=STATUS_MAP[d.s]||(CYCLE.indexOf(d.s)>=0?d.s:"À faire");});
 }
 function load(){
@@ -421,7 +449,50 @@ function delBlock(key,label){
     STATE.hidden[key]=true;save();applyHidden();render();
   }
 }
+
+function fmtNum(n){return (Math.round(n*10)/10).toString().replace('.',',');}
+function totalHours(){let t=STATE.hours.base||0;(STATE.hours.sessions||[]).forEach(x=>{t+=parseFloat(x.dur)||0;});return t;}
+function renderHours(){
+  const tot=document.getElementById('hoursTotal');if(!tot)return;
+  tot.textContent=fmtNum(totalHours());
+  const list=document.getElementById('sessionsList');list.innerHTML="";
+  // ligne "base"
+  const b=document.createElement('div');b.className='sess';
+  b.innerHTML=`<span class="sdate">base est.</span>
+    <span class="sdur" ondblclick="editBase(this)" title="Double-clique">${fmtNum(STATE.hours.base||0)}</span>
+    <span class="snote" style="font-style:italic;color:#9a93a6">estimation de départ (temps déjà investi, non chronométré)</span>`;
+  list.appendChild(b);
+  (STATE.hours.sessions||[]).forEach((x,i)=>{
+    const d=document.createElement('div');d.className='sess';
+    d.innerHTML=`<span class="sdate" ondblclick="editSess(this,${i},'date')" title="Double-clique">${escapeHtml(x.date||'')}</span>
+      <span class="sdur" ondblclick="editSess(this,${i},'dur')" title="Double-clique">${fmtNum(parseFloat(x.dur)||0)}</span>
+      <span class="snote" ondblclick="editSess(this,${i},'note')" title="Double-clique">${escapeHtml(x.note||'')}</span>
+      <button class="sdel" onclick="delSession(${i})" title="Retirer">✕</button>`;
+    list.appendChild(d);
+  });
+}
+function addSession(){
+  const today=new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'});
+  STATE.hours.sessions.push({date:today,dur:1,note:"Nouvelle session"});save();renderHours();
+}
+function delSession(i){STATE.hours.sessions.splice(i,1);save();renderHours();}
+function editBase(el){
+  el.setAttribute('contenteditable','true');el.focus();
+  const r=document.createRange();r.selectNodeContents(el);const sel=getSelection();sel.removeAllRanges();sel.addRange(r);
+  el.onblur=()=>{el.removeAttribute('contenteditable');const v=parseFloat(el.textContent.replace(',','.'));STATE.hours.base=isNaN(v)?0:v;save();renderHours();};
+  el.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();el.blur();}};
+}
+function editSess(el,i,field){
+  el.setAttribute('contenteditable','true');el.focus();
+  const r=document.createRange();r.selectNodeContents(el);const sel=getSelection();sel.removeAllRanges();sel.addRange(r);
+  el.onblur=()=>{el.removeAttribute('contenteditable');let val=el.textContent.trim();
+    if(field==='dur'){val=parseFloat(val.replace(',','.'));if(isNaN(val))val=0;}
+    STATE.hours.sessions[i][field]=val;save();renderHours();};
+  el.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();el.blur();}};
+}
+
 function applyHidden(){
+  const hc=document.getElementById('hoursCard');if(hc)hc.style.display=STATE.hidden.hours?'none':'';
   const tl=document.getElementById('timelineCard');if(tl)tl.style.display=STATE.hidden.timeline?'none':'';
   const mb=document.querySelector('.month');if(mb)mb.style.display=STATE.hidden.focus?'none':'';
   const gb=document.querySelector('.global');if(gb)gb.style.display=STATE.hidden.global?'none':'';
@@ -436,12 +507,13 @@ document.getElementById('focusBox').addEventListener('input',e=>{STATE.focus=e.t
   const month=document.querySelector('.month');
   if(month){const b=document.createElement('button');b.className='blockdel';b.title='Supprimer ce bloc';b.textContent='✕';b.onclick=()=>delBlock('focus','Mes focus du moment');month.appendChild(b);}
   const global=document.querySelector('.global');
-  if(global){const b=document.createElement('button');b.className='blockdel';b.title='Supprimer ce bloc';b.textContent='✕';b.onclick=()=>delBlock('global','Où j\'en suis, globalement');global.appendChild(b);}
+  if(global){const b=document.createElement('button');b.className='blockdel';b.title='Supprimer ce bloc';b.textContent='✕';b.onclick=()=>delBlock('global','Ma progression');global.appendChild(b);}
   const next=document.querySelector('.next');
   if(next){const b=document.createElement('button');b.className='blockdel';b.title='Supprimer ce bloc';b.textContent='✕';b.onclick=()=>delBlock('next','Mes prochaines étapes');next.appendChild(b);}
 })();
 render();
 renderTimeline();
+renderHours();
 applyHidden();
 save();
 </script>
