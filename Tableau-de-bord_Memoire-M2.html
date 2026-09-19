@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mémoire M2 — Tableau de bord</title>
+<style>
+  :root{
+    --pinkbg:#fdeef3;--peachbg:#fdf1e8;--yellowbg:#fdfae8;--greenbg:#eef8ef;--bluebg:#ecf5fb;--purplebg:#f4eefb;
+    --ink:#5a5566;--soft:#9a93a6;--line:#efe9f2;
+
+
+    --doneink:#3f7d53;--progink:#a86a1e;--waitink:#b34659;--todoink:#3f6f92;--ideaink:#6f4ea8;--skipink:#88818f;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+
+  /* barres de défilement pastel */
+  *{scrollbar-width:thin;scrollbar-color:#d4c2ec #f4eefb}
+  ::-webkit-scrollbar{height:10px;width:10px}
+  ::-webkit-scrollbar-track{background:#f4eefb;border-radius:10px}
+  ::-webkit-scrollbar-thumb{background:linear-gradient(135deg,#c3ade4,#b8d9ee);border-radius:10px;border:2px solid #f4eefb}
+  ::-webkit-scrollbar-thumb:hover{background:linear-gradient(135deg,#b39ad8,#a7cbe6)}
+  .tl-scroll::-webkit-scrollbar-thumb{background:linear-gradient(90deg,#f7b8cd,#c3ade4)}
+
+  body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;color:var(--ink);padding:26px 16px 70px;line-height:1.45;min-height:100vh;
+    background:linear-gradient(135deg,#fdeef3,#fdf1e8,#fdfae8,#eef8ef,#ecf5fb,#f4eefb);background-attachment:fixed}
+  .wrap{max-width:1000px;margin:0 auto}
+  header{text-align:center;margin-bottom:20px}
+  h1{font-size:27px;font-weight:800;letter-spacing:-.4px;background:linear-gradient(90deg,#e88bab,#e6a06a,#8bb89a,#7aa8d0,#a98bd4);
+     -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .sub{color:var(--soft);font-size:14px;font-style:italic;margin-top:4px}
+
+  .toolbar{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+  .btn{background:rgba(255,255,255,.8);border:1px solid var(--line);color:var(--ink);font-family:inherit;font-size:12.5px;
+       padding:8px 16px;border-radius:20px;cursor:pointer;font-weight:600;box-shadow:0 2px 8px rgba(150,120,160,.1);transition:transform .1s,background .2s}
+  .btn:hover{background:#fff}.btn:active{transform:scale(.95)}
+  .btn.primary{background:linear-gradient(135deg,#c3ade4,#b8d9ee);color:#4a4560;border:none}
+
+  .card-base{background:rgba(255,255,255,.74);backdrop-filter:blur(6px);border-radius:22px;box-shadow:0 4px 20px rgba(150,120,160,.12);border:1px solid rgba(255,255,255,.6)}
+
+  .month{padding:18px 22px;padding-right:44px;margin-bottom:18px;display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap}
+  .month .mleft{flex:0 0 auto;text-align:center;background:var(--purplebg);border-radius:16px;padding:12px 18px;min-width:120px}
+  .month .mleft .lbl{font-size:11px;color:var(--soft);text-transform:uppercase;letter-spacing:1px;font-weight:700}
+  .month .mleft .val{font-size:19px;font-weight:800;color:#8b6fb8}
+  .month .mright{flex:1;min-width:240px}
+  .month h3{font-size:14px;margin-bottom:8px;font-weight:800}
+  .focus{width:100%;border:1.5px dashed #e3d4ee;background:rgba(255,255,255,.6);border-radius:12px;padding:10px 12px;font-family:inherit;font-size:13.5px;color:var(--ink);resize:vertical;min-height:60px}
+  .focus:focus{outline:none;border-color:#c3ade4}
+  .savednote{font-size:11px;color:var(--soft);margin-top:6px;height:14px}
+
+  .global{padding:24px 26px;padding-right:44px;margin-bottom:22px;display:flex;align-items:center;gap:30px;flex-wrap:wrap}
+  .ring{--p:0;width:140px;height:140px;border-radius:50%;flex:0 0 auto;position:relative;
+        background:conic-gradient(#7cc492 calc(var(--p)*1%), #ece6f0 0);display:flex;align-items:center;justify-content:center;transition:background .6s}
+  .ring::before{content:"";position:absolute;width:104px;height:104px;background:#fff;border-radius:50%;box-shadow:inset 0 2px 6px rgba(150,120,160,.12)}
+  .ring b{position:relative;font-size:32px;color:#7cae8e;font-weight:800}
+  .ring small{position:relative;display:block;text-align:center;font-size:10px;color:var(--soft);font-weight:700;letter-spacing:1px}
+  .gtext{flex:1;min-width:220px}.gtext h2{font-size:17px;margin-bottom:12px}
+  .pills{display:flex;gap:8px;flex-wrap:wrap}
+  .pill{font-size:12px;font-weight:700;padding:6px 13px;border-radius:20px}
+  .k-done{background:var(--greenbg);color:var(--doneink)}.k-prog{background:var(--peachbg);color:var(--progink)}
+  .k-wait{background:var(--pinkbg);color:var(--waitink)}.k-todo{background:var(--bluebg);color:var(--todoink)}.k-skip{background:#f0eef2;color:var(--skipink)}
+
+  h4.section{font-size:12px;text-transform:uppercase;letter-spacing:1.5px;color:var(--soft);margin:24px 6px 12px;font-weight:800}
+
+  .chantier{padding:18px 22px;margin-bottom:16px;border-left:7px solid var(--c)}
+  .chead{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:11px;padding-right:34px}
+  .cname{font-weight:800;font-size:16px;color:var(--c2)}
+  .cpct{font-weight:800;font-size:17px;color:var(--c2)}
+  .bar{height:15px;background:rgba(230,224,235,.7);border-radius:12px;overflow:hidden}
+  .bar span{display:block;height:100%;border-radius:12px;background:var(--c);transition:width .6s ease}
+  .tasks{margin-top:15px;display:grid;gap:8px}
+  .task{display:flex;align-items:center;gap:10px;font-size:13.5px;padding:5px 6px;border-radius:10px;transition:background .2s}
+  .task:hover{background:rgba(255,255,255,.55)}
+  .task .lbl{flex:1;cursor:text;padding:3px 5px;border-radius:6px}
+  .task .lbl:hover{background:rgba(195,173,228,.12)}
+  .task .lbl[contenteditable="true"]:focus{outline:2px solid #c3ade4;background:#fff}
+  .task.is-skip .lbl{color:var(--skip,#c9c4d0);text-decoration:line-through}
+  .st{font-size:11px;font-weight:700;padding:4px 11px;border-radius:13px;cursor:pointer;user-select:none;border:none;font-family:inherit;transition:transform .1s;white-space:nowrap}
+  .st:active{transform:scale(.93)}
+  .st.s-done{background:var(--greenbg);color:var(--doneink)}
+  .st.s-prog{background:var(--peachbg);color:var(--progink)}
+  .st.s-wait{background:var(--pinkbg);color:var(--waitink)}
+  .st.s-todo{background:var(--bluebg);color:var(--todoink)}
+  .st.s-idea{background:var(--purplebg);color:var(--ideaink)}
+  .st.s-skip{background:#f0eef2;color:var(--skipink)}
+  .del{background:none;border:none;color:#e0a9b4;font-size:16px;cursor:pointer;padding:2px 6px;border-radius:6px;line-height:1;opacity:.5;transition:opacity .2s,background .2s}
+  .task:hover .del{opacity:1}.del:hover{background:#fbeceb;color:#c0392b}
+  .addbtn{margin-top:10px;background:rgba(255,255,255,.6);border:1.5px dashed var(--c);color:var(--c2);font-family:inherit;font-size:12.5px;font-weight:700;padding:7px 14px;border-radius:12px;cursor:pointer;transition:background .2s}
+  .addbtn:hover{background:#fff}
+
+  .next{padding:22px 26px;padding-right:44px;margin-top:24px;border-radius:22px;background:linear-gradient(135deg,rgba(212,194,236,.55),rgba(184,217,238,.55));border:1px solid rgba(255,255,255,.6)}
+  .next h2{font-size:16px;margin-bottom:12px;color:#6d5a8f}
+  .nextlist{display:grid;gap:9px}
+  .step{display:flex;gap:12px;align-items:flex-start;font-size:14px}
+  .num{flex:0 0 auto;width:24px;height:24px;border-radius:50%;background:#fff;color:#8b6fb8;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:13px;box-shadow:0 2px 6px rgba(150,120,160,.2)}
+  .steptxt{flex:1;cursor:text;padding:3px 6px;border-radius:8px}
+  .steptxt:hover{background:rgba(255,255,255,.5)}
+  .steptxt[contenteditable="true"]:focus{outline:2px solid #c3ade4;background:#fff}
+
+  .foot{text-align:center;color:var(--soft);font-size:12px;margin-top:26px}
+  .hintbar{text-align:center;font-size:12px;color:var(--soft);margin-bottom:16px;font-style:italic}
+
+
+  /* croix de suppression de bloc */
+  .card-base,.next{position:relative}
+  .blockdel{position:absolute;top:14px;right:16px;background:rgba(255,255,255,.7);border:1px solid #f0d4da;color:#d98a98;
+            width:26px;height:26px;border-radius:50%;font-size:15px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;
+            opacity:.55;transition:opacity .2s,background .2s,transform .1s;z-index:5}
+  .blockdel:hover{opacity:1;background:#fbeceb;color:#c0392b}
+  .blockdel:active{transform:scale(.9)}
+  @media print{.blockdel{display:none!important}}
+
+  /* ===== FRISE TEMPORELLE ===== */
+  .timeline{padding:20px 24px 14px;margin-bottom:20px}
+  .tl-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;padding-right:30px}
+  .tl-head h3{font-size:15px;font-weight:800;color:#7a6a9a}
+  .tl-head .tl-add{background:rgba(255,255,255,.6);border:1.5px dashed #c3ade4;color:#8b6fb8;font-family:inherit;font-size:12px;font-weight:700;padding:6px 12px;border-radius:11px;cursor:pointer}
+  .tl-head .tl-add:hover{background:#fff}
+  .tl-hint{font-size:11px;color:var(--soft);font-style:italic;margin-bottom:12px}
+  .tl-scroll{overflow-x:auto;padding-bottom:10px}
+  .tl-track{position:relative;min-width:920px;height:auto;padding-top:8px}
+  .tl-line{position:absolute;left:0;right:0;top:38px;height:4px;background:linear-gradient(90deg,#bfe3c4,#f9cba8,#f7b8cd,#f6e6a3,#b8d9ee,#d4c2ec);border-radius:4px}
+  .tl-months{display:flex;position:relative}
+  .tl-month{flex:1;text-align:center;font-size:11px;font-weight:700;color:var(--soft);text-transform:uppercase;letter-spacing:.5px;padding-bottom:26px;position:relative}
+  .tl-month::after{content:"";position:absolute;left:50%;top:26px;transform:translateX(-50%);width:2px;height:8px;background:#e0d8ea}
+  /* rangée de jalons */
+  .tl-milestones{position:relative;margin-top:8px;min-height:40px}
+  .tl-ms{position:absolute;transform:translateX(-50%);width:132px;text-align:center;cursor:default}
+  .tl-dot{width:16px;height:16px;border-radius:50%;margin:0 auto 5px;border:3px solid #fff;box-shadow:0 2px 6px rgba(150,120,160,.3)}
+  .tl-lbl{font-size:11.5px;line-height:1.25;color:var(--ink);background:rgba(255,255,255,.75);border-radius:8px;padding:4px 6px;cursor:text}
+  .tl-lbl:hover{background:#fff}
+  .tl-lbl[contenteditable="true"]:focus{outline:2px solid #c3ade4;background:#fff}
+  .tl-date{font-size:10px;font-weight:800;color:#8b6fb8;margin-top:3px;cursor:pointer;display:block}
+  .tl-date:hover{text-decoration:underline}
+  .tl-del{position:absolute;top:-6px;right:14px;background:#fff;border:1px solid #f0d4da;color:#d98a98;width:18px;height:18px;border-radius:50%;font-size:11px;line-height:1;cursor:pointer;opacity:0;transition:opacity .2s;display:flex;align-items:center;justify-content:center}
+  .tl-ms:hover .tl-del{opacity:1}.tl-del:hover{background:#fbeceb;color:#c0392b}
+  .d-done{background:#7cc492}.d-prog{background:#f2b56b}.d-wait{background:#ef9aa8}.d-todo{background:#9dc4e0}.d-key{background:#c3ade4}.d-crit{background:#e8607a;box-shadow:0 0 0 4px rgba(232,96,122,.18),0 2px 6px rgba(150,120,160,.3)}
+  @media print{.tl-add,.tl-del,.tl-hint{display:none!important}.tl-scroll{overflow:visible}.tl-track{min-width:0}}
+
+  /* ===== IMPRESSION / PDF PROPRE ===== */
+  @media print{
+    body{background:#fff!important;padding:0;color:#333}
+    .toolbar,.hintbar,.del,.addbtn,.savednote,.foot{display:none!important}
+    .card-base{box-shadow:none;border:1px solid #e0dae8;background:#fff!important;backdrop-filter:none}
+    .focus{border:1px solid #e0dae8}
+    h1{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .ring,.bar span,.pill,.st{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .chantier{break-inside:avoid;page-break-inside:avoid}
+    .lbl[contenteditable],.steptxt[contenteditable]{outline:none!important}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Mémoire M2 — Tableau de bord</h1>
+    <div class="sub">Sérialité sexuelle : ce que les dispositifs ne voient pas — SALVAC &amp; CNAIP</div>
+  </header>
+
+  <div class="toolbar">
+    <button class="btn primary" onclick="window.print()">📄 Exporter en PDF</button>
+    <button class="btn" onclick="resetAll()">↺ Réinitialiser</button>
+  </div>
+  <div class="hintbar">✏️ Double-clique un texte pour le modifier · clique un statut pour le changer · ✕ pour supprimer · « + » pour ajouter</div>
+
+  <div class="card-base timeline" id="timelineCard">
+    <div class="tl-head"><h3>🗓️ Rétroplanning de l'année</h3><button class="tl-add" onclick="addMs()">+ jalon</button></div>
+    <div class="tl-hint">Double-clique un intitulé ou une date pour l'éditer · clique la pastille pour changer le statut · ✕ pour retirer. Dates provisoires — le calendrier officiel du CNAM se débloque le 24 sept. 2026 : cale les dates ce jour-là.</div>
+    <div class="tl-scroll"><div class="tl-track" id="tlTrack"></div></div>
+    <button class="blockdel" title="Supprimer ce bloc" onclick="delBlock('timeline','Rétroplanning de l\'année')" style="top:14px;right:16px">✕</button>
+  </div>
+
+  <div class="card-base month">
+    <div class="mleft"><div class="lbl">Dernière visite</div><div class="val" id="lastVisit">—</div></div>
+    <div class="mright">
+      <h3>🎯 Mes focus du moment</h3>
+      <textarea class="focus" id="focusBox" placeholder="Ce que je veux avancer ces prochaines semaines…"></textarea>
+      <div class="savednote" id="savedNote"></div>
+    </div>
+  </div>
+
+  <div class="card-base global">
+    <div class="ring" id="ring"><b id="ringPct">0%</b><small>ACHEVÉ</small></div>
+    <div class="gtext"><h2>Où j'en suis, globalement</h2><div class="pills" id="pills"></div></div>
+  </div>
+
+  <h4 class="section">Avancement par chantier</h4>
+  <div id="chantiers"></div>
+
+  <div class="next">
+    <h2>▶ Mes prochaines étapes</h2>
+    <div class="nextlist" id="nextlist"></div>
+  </div>
+
+  <div class="foot">Enregistré automatiquement dans ce navigateur. 🌿</div>
+</div>
+
+<script>
+const COLORS={Cadrage:{c:'#bfe3c4',c2:'#5a9e6e'},Indice:{c:'#f9cba8',c2:'#c9823f'},Accès:{c:'#f7b8cd',c2:'#c86a86'},Sources:{c:'#f6e6a3',c2:'#b39a33'},Rédaction:{c:'#b8d9ee',c2:'#5389b5'}};
+const NAMES={Cadrage:"① Cadrage & concepts",Indice:"② Indice de difficulté",Accès:"③ Accès & encadrement",Sources:"④ Sources & biblio",Rédaction:"⑤ Rédaction"};
+const ALLGROUPS=["Cadrage","Indice","Accès","Sources","Rédaction"];
+let GROUPS=ALLGROUPS.slice();
+const CYCLE=["À faire","En cours","En attente","À décider","Idée","Validé","Terminé","Écarté"];
+const DONE=["Terminé","Validé"];
+const SKLASS={"Terminé":"s-done","Validé":"s-done","En cours":"s-prog","En attente":"s-wait","À décider":"s-wait","À faire":"s-todo","Idée":"s-idea","Écarté":"s-skip"};
+
+const DEFAULT={
+ tasks:[
+  {g:"Cadrage",t:"Sujet, problématique, variable (horloge t0→t1)",s:"Terminé"},
+  {g:"Cadrage",t:"Proposition réfutable (Davis) + distinction difficulté/dispositif",s:"Terminé"},
+  {g:"Cadrage",t:"Typologie des 4 cécités",s:"Terminé"},
+  {g:"Cadrage",t:"Angle longitudinal 2007→2026 (DACG / Dallest)",s:"Terminé"},
+  {g:"Cadrage",t:"Fil conducteur Pinatel / Bauer",s:"Terminé"},
+  {g:"Indice",t:"D1 — Contrainte spatiale (nb de communes)",s:"Validé"},
+  {g:"Indice",t:"D2 — Contrainte temporelle (ancienneté du fait le + ancien)",s:"Validé"},
+  {g:"Indice",t:"D3 — Variabilité du MO (lieu / approche / moyen)",s:"Validé"},
+  {g:"Indice",t:"D4 — Qualité des traces (hors SALVAC → argument de thèse)",s:"Écarté"},
+  {g:"Indice",t:"D5 — Nombre de victimes (circulaire)",s:"Écarté"},
+  {g:"Indice",t:"Figer la grille de cotation 0/1/2",s:"À faire"},
+  {g:"Indice",t:"Construire les vignettes (cas fictifs)",s:"À faire"},
+  {g:"Indice",t:"Pilote kappa inter-codeurs (script Python)",s:"À faire"},
+  {g:"Accès",t:"PR envoyé à Barlatier",s:"Terminé"},
+  {g:"Accès",t:"Relance Barlatier (si silence)",s:"En attente"},
+  {g:"Accès",t:"Attribution du directeur par le CNAM (octobre)",s:"En attente"},
+  {g:"Accès",t:"Mail Chaquin (questions de faisabilité SALVAC)",s:"À décider"},
+  {g:"Accès",t:"Vérifier : lieu (commune) + dates exploitables dans SALVAC",s:"À faire"},
+  {g:"Accès",t:"Vérifier : horodatages t0 / t1 extractibles",s:"À faire"},
+  {g:"Sources",t:"Bibliographie consolidée (+ Marin 2003, Davies 2018)",s:"En cours"},
+  {g:"Sources",t:"Margot 2009 (via Davies uniquement)",s:"En cours"},
+  {g:"Sources",t:"Sources Chopin & Aebi (accès OCRVP, biais 71,64 %)",s:"Terminé"},
+  {g:"Rédaction",t:"Introduction (propos liminaires)",s:"Terminé"},
+  {g:"Rédaction",t:"Plan détaillé (3 parties, fil Bauer, grille CNAM)",s:"Terminé"},
+  {g:"Rédaction",t:"Partie I — Dispositifs & cécités (rédigeable maintenant)",s:"À faire"},
+  {g:"Rédaction",t:"Partie II — Construire la mesure",s:"À faire"},
+  {g:"Rédaction",t:"Partie III — Faisabilité, résultats, discussion",s:"À faire"},
+  {g:"Rédaction",t:"Conclusion & recommandations",s:"À faire"},
+ ],
+ focus:"",
+ next:["Figer la grille de cotation 0/1/2 des trois dimensions (préalable au kappa et aux vignettes).",
+       "Commencer la rédaction de la Partie I — documentaire et juridique, aucun accès requis.",
+       "Trancher à tête reposée le timing du mail Chaquin (avant ou après directeur sécurisé)."],
+ hidden:{focus:false,global:false,next:false,timeline:false},
+ months:["Sep 26","Oct","Nov","Déc","Jan 27","Fév","Mar","Avr","Mai","Juin"],
+ milestones:[
+  {m:0.2,t:"Grille de cotation + Partie I", s:"prog"},
+  {m:1,  t:"Directeur attribué (CNAM)", s:"key"},
+  {m:2,  t:"Mail Chaquin + vérifs SALVAC", s:"todo"},
+  {m:3,  t:"Pilote kappa + Partie II", s:"todo"},
+  {m:5,  t:"Accès données + Partie III", s:"todo"},
+  {m:7,  t:"Conclusion + relecture", s:"todo"},
+  {m:8.3,t:"⚠ DÉPÔT (aucun retard toléré)", s:"crit"},
+  {m:9.3,t:"Soutenance", s:"key"}
+ ]
+};
+const KEY="dashboard_memoire_v2";
+let STATE;
+
+function load(){
+  try{const s=localStorage.getItem(KEY);STATE=s?JSON.parse(s):JSON.parse(JSON.stringify(DEFAULT));}
+  catch(e){STATE=JSON.parse(JSON.stringify(DEFAULT));}
+  if(!STATE.tasks)STATE=JSON.parse(JSON.stringify(DEFAULT));
+  if(!STATE.hidden)STATE.hidden={focus:false,global:false,next:false};
+  if(!STATE.hidden.chantiers)STATE.hidden.chantiers=[];
+  if(STATE.hidden.timeline===undefined)STATE.hidden.timeline=false;
+  if(!STATE.months)STATE.months=JSON.parse(JSON.stringify(DEFAULT.months));
+  if(!STATE.milestones)STATE.milestones=JSON.parse(JSON.stringify(DEFAULT.milestones));
+}
+function save(){try{STATE.lastVisit=new Date().toISOString();localStorage.setItem(KEY,JSON.stringify(STATE));}catch(e){}}
+function flashSaved(){const n=document.getElementById('savedNote');n.textContent="✓ enregistré";clearTimeout(window._t);window._t=setTimeout(()=>n.textContent="",1400);}
+
+function render(){
+  GROUPS=ALLGROUPS.filter(g=>!(STATE.hidden.chantiers||[]).includes(g));
+  const cont=document.getElementById('chantiers');cont.innerHTML="";
+  GROUPS.forEach(g=>{
+    const items=STATE.tasks.filter(d=>d.g===g);
+    const counted=items.filter(d=>d.s!=="Écarté"&&d.s!=="Idée");
+    const done=counted.filter(d=>DONE.includes(d.s)).length;
+    const pct=counted.length?Math.round(done/counted.length*100):0;
+    const co=COLORS[g];
+    const div=document.createElement('div');
+    div.className="card-base chantier";div.style.setProperty('--c',co.c);div.style.setProperty('--c2',co.c2);div.style.setProperty('--skip','#c9c4d0');
+    let html=`<button class="blockdel" title="Supprimer ce chantier" onclick="delChantier('${g}')">✕</button><div class="chead"><span class="cname">${NAMES[g]}</span><span class="cpct">${pct}%</span></div>
+      <div class="bar"><span style="width:${pct}%"></span></div><div class="tasks">`;
+    items.forEach(d=>{
+      const idx=STATE.tasks.indexOf(d);
+      const skip=(d.s==="Écarté")?" is-skip":"";
+      html+=`<div class="task${skip}">
+        <span class="lbl" data-i="${idx}" ondblclick="editTask(this,${idx})" title="Double-clique pour modifier">${escapeHtml(d.t)}</span>
+        <button class="st ${SKLASS[d.s]||'s-todo'}" onclick="cycle(${idx})">${d.s}</button>
+        <button class="del" onclick="delTask(${idx})" title="Supprimer">✕</button></div>`;
+    });
+    html+=`</div><button class="addbtn" onclick="addTask('${g}')">+ ajouter une tâche</button>`;
+    div.innerHTML=html;cont.appendChild(div);
+  });
+  // global
+  const counted=STATE.tasks.filter(d=>d.s!=="Écarté"&&d.s!=="Idée");
+  const done=counted.filter(d=>DONE.includes(d.s)).length;
+  const gpct=counted.length?Math.round(done/counted.length*100):0;
+  document.getElementById('ring').style.setProperty('--p',gpct);
+  document.getElementById('ringPct').textContent=gpct+"%";
+  const cnt=s=>STATE.tasks.filter(d=>d.s===s).length;
+  const nd=STATE.tasks.filter(d=>DONE.includes(d.s)).length;
+  document.getElementById('pills').innerHTML=
+    `<span class="pill k-done">${nd} terminé / validé</span>
+     <span class="pill k-prog">${cnt("En cours")} en cours</span>
+     <span class="pill k-wait">${cnt("En attente")+cnt("À décider")} en attente / à décider</span>
+     <span class="pill k-todo">${cnt("À faire")} à faire</span>
+     <span class="pill k-skip">${cnt("Écarté")+cnt("Idée")} écarté / idée</span>`;
+  // prochains pas
+  const nl=document.getElementById('nextlist');nl.innerHTML="";
+  STATE.next.forEach((txt,i)=>{
+    nl.innerHTML+=`<div class="step"><span class="num">${i+1}</span>
+      <span class="steptxt" ondblclick="editNext(this,${i})" title="Double-clique pour modifier">${escapeHtml(txt)}</span></div>`;
+  });
+}
+
+const MSCYCLE=[["todo","À faire"],["prog","En cours"],["wait","En attente"],["done","Fait"],["key","Jalon clé"],["crit","Critique"]];
+function msNextStatus(cur){const i=MSCYCLE.findIndex(x=>x[0]===cur);return MSCYCLE[(i+1)%MSCYCLE.length][0];}
+function renderTimeline(){
+  const track=document.getElementById('tlTrack');if(!track)return;
+  const n=STATE.months.length;
+  let mh='<div class="tl-line"></div><div class="tl-months">';
+  STATE.months.forEach(m=>{mh+=`<div class="tl-month">${escapeHtml(m)}</div>`;});
+  mh+='</div><div class="tl-milestones" id="tlMs" style="height:'+(computeRows()*54+10)+'px"></div>';
+  track.innerHTML=mh;
+  const cont=document.getElementById('tlMs');
+  // positionnement + gestion des collisions (empilement)
+  const placed=[];
+  STATE.milestones.forEach((ms,idx)=>{
+    const leftPct=(ms.m+0.5)/n*100;
+    // trouve une "ligne" libre pour éviter chevauchement (si <8% d'écart horizontal)
+    let row=0;
+    while(placed.some(p=>p.row===row && Math.abs(p.left-leftPct)<12)) row++;
+    placed.push({row,left:leftPct});
+    const div=document.createElement('div');
+    div.className='tl-ms';div.style.left=leftPct+'%';div.style.top=(row*54)+'px';
+    div.innerHTML=`<button class="tl-del" title="Retirer" onclick="delMs(${idx})">✕</button>
+      <div class="tl-dot d-${ms.s}" onclick="cycleMs(${idx})" title="Changer le statut" style="cursor:pointer"></div>
+      <div class="tl-lbl" ondblclick="editMs(this,${idx})" title="Double-clique pour modifier">${escapeHtml(ms.t)}</div>
+      <span class="tl-date" onclick="editDate(${idx})" title="Modifier la date/mois">${escapeHtml(STATE.months[Math.round(ms.m)]||STATE.months[Math.floor(ms.m)]||'')}</span>`;
+    cont.appendChild(div);
+  });
+}
+function computeRows(){
+  const n=STATE.months.length;const placed=[];let maxRow=0;
+  STATE.milestones.forEach(ms=>{const left=(ms.m+0.5)/n*100;let row=0;
+    while(placed.some(p=>p.row===row && Math.abs(p.left-left)<12))row++;placed.push({row,left});if(row>maxRow)maxRow=row;});
+  return maxRow+1;
+}
+function cycleMs(i){STATE.milestones[i].s=msNextStatus(STATE.milestones[i].s);save();renderTimeline();}
+function delMs(i){if(confirm("Retirer ce jalon ?\n\n« "+STATE.milestones[i].t+" »")){STATE.milestones.splice(i,1);save();renderTimeline();}}
+function addMs(){STATE.milestones.push({m:Math.min(STATE.months.length-1,4),t:"Nouveau jalon",s:"todo"});save();renderTimeline();}
+function editMs(el,i){el.setAttribute('contenteditable','true');el.focus();
+  const r=document.createRange();r.selectNodeContents(el);const sel=getSelection();sel.removeAllRanges();sel.addRange(r);
+  el.onblur=()=>{el.removeAttribute('contenteditable');STATE.milestones[i].t=el.textContent.trim()||"(sans titre)";save();renderTimeline();};
+  el.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();el.blur();}};}
+function editDate(i){
+  const cur=STATE.milestones[i].m;
+  const list=STATE.months.map((m,idx)=>idx+" = "+m).join("\n");
+  const v=prompt("À quel mois placer ce jalon ?\nEntre un numéro :\n\n"+list, Math.round(cur));
+  if(v!==null&&v!==""){const num=parseFloat(v.replace(',','.'));if(!isNaN(num)&&num>=0&&num<STATE.months.length){STATE.milestones[i].m=num;save();renderTimeline();}}
+}
+
+function escapeHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function cycle(i){const c=CYCLE.indexOf(STATE.tasks[i].s);STATE.tasks[i].s=CYCLE[(c+1)%CYCLE.length];save();render();}
+function delTask(i){if(confirm("Supprimer cette ligne ?\n\n« "+STATE.tasks[i].t+" »")){STATE.tasks.splice(i,1);save();render();}}
+function addTask(g){STATE.tasks.push({g:g,t:"Nouvelle tâche",s:"À faire"});save();render();
+  // met le focus sur la nouvelle ligne pour édition immédiate
+  setTimeout(()=>{const spans=[...document.querySelectorAll('.lbl')];const last=spans.reverse().find(s=>STATE.tasks[+s.dataset.i].g===g&&STATE.tasks[+s.dataset.i].t==="Nouvelle tâche");if(last)editTask(last,+last.dataset.i);},50);}
+function editTask(el,i){
+  el.setAttribute('contenteditable','true');el.focus();
+  const r=document.createRange();r.selectNodeContents(el);const sel=getSelection();sel.removeAllRanges();sel.addRange(r);
+  const fin=()=>{el.removeAttribute('contenteditable');STATE.tasks[i].t=el.textContent.trim()||"(sans titre)";save();render();};
+  el.onblur=fin;el.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();el.blur();}};
+}
+function editNext(el,i){
+  el.setAttribute('contenteditable','true');el.focus();
+  const r=document.createRange();r.selectNodeContents(el);const sel=getSelection();sel.removeAllRanges();sel.addRange(r);
+  const fin=()=>{el.removeAttribute('contenteditable');STATE.next[i]=el.textContent.trim();save();};
+  el.onblur=fin;el.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();el.blur();}};
+}
+
+function delChantier(g){
+  if(confirm("Supprimer le chantier « "+NAMES[g]+" » et toutes ses lignes de l'affichage ?\n\n(↺ Réinitialiser le fera revenir.)")){
+    if(!STATE.hidden.chantiers)STATE.hidden.chantiers=[];
+  if(STATE.hidden.timeline===undefined)STATE.hidden.timeline=false;
+  if(!STATE.months)STATE.months=JSON.parse(JSON.stringify(DEFAULT.months));
+  if(!STATE.milestones)STATE.milestones=JSON.parse(JSON.stringify(DEFAULT.milestones));
+    STATE.hidden.chantiers.push(g);save();render();
+  }
+}
+function delBlock(key,label){
+  if(confirm("Supprimer le bloc « "+label+" » ?\n\n(Le bouton ↺ Réinitialiser le fera revenir si besoin.)")){
+    STATE.hidden[key]=true;save();applyHidden();render();
+  }
+}
+function applyHidden(){
+  const tl=document.getElementById('timelineCard');if(tl)tl.style.display=STATE.hidden.timeline?'none':'';
+  const mb=document.querySelector('.month');if(mb)mb.style.display=STATE.hidden.focus?'none':'';
+  const gb=document.querySelector('.global');if(gb)gb.style.display=STATE.hidden.global?'none':'';
+  const nx=document.querySelector('.next');if(nx)nx.style.display=STATE.hidden.next?'none':'';
+}
+
+function resetAll(){if(confirm("Remettre le tableau à son état initial ?\nToutes tes modifications seront perdues.")){localStorage.removeItem(KEY);location.reload();}}
+
+// init
+load();
+document.getElementById('focusBox').value=STATE.focus||"";
+try{if(STATE.lastVisit){const d=new Date(STATE.lastVisit);document.getElementById('lastVisit').textContent=d.toLocaleDateString('fr-FR',{day:'2-digit',month:'short'});}else{document.getElementById('lastVisit').textContent="aujourd'hui";}}catch(e){document.getElementById('lastVisit').textContent="aujourd'hui";}
+document.getElementById('focusBox').addEventListener('input',e=>{STATE.focus=e.target.value;save();flashSaved();});
+
+// croix sur les blocs fixes
+(function(){
+  const month=document.querySelector('.month');
+  if(month){const b=document.createElement('button');b.className='blockdel';b.title='Supprimer ce bloc';b.textContent='✕';b.onclick=()=>delBlock('focus','Mes focus du moment');month.appendChild(b);}
+  const global=document.querySelector('.global');
+  if(global){const b=document.createElement('button');b.className='blockdel';b.title='Supprimer ce bloc';b.textContent='✕';b.onclick=()=>delBlock('global','Où j\'en suis, globalement');global.appendChild(b);}
+  const next=document.querySelector('.next');
+  if(next){const b=document.createElement('button');b.className='blockdel';b.title='Supprimer ce bloc';b.textContent='✕';b.onclick=()=>delBlock('next','Mes prochaines étapes');next.appendChild(b);}
+})();
+applyHidden();
+
+render();
+renderTimeline();
+applyHidden();
+save();
+</script>
+</body>
+</html>
