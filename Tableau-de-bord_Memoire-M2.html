@@ -144,9 +144,7 @@
   </header>
   <div class="toolbar">
     <button class="btn primary" onclick="window.print()">📄 Exporter en PDF</button>
-    <button class="btn" onclick="exportData()">💾 Télécharger JSON</button>
-    <button class="btn" onclick="shareData()">📤 Partager / Dropbox</button>
-    <button class="btn" onclick="copyData()">📋 Copier JSON</button>
+    <button class="btn" onclick="exportData()">💾 Exporter</button>
     <button class="btn" onclick="document.getElementById('importFile').click()">📥 Importer</button>
     <input type="file" id="importFile" accept=".json,application/json,text/plain" style="display:none" onchange="importData(this)">
     <button class="btn" onclick="resetAll()">↺ Réinitialiser</button>
