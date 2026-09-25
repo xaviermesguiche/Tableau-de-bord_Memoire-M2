@@ -170,7 +170,7 @@
   <div class="hintbar">✏️ Double-clique un texte pour le modifier · clique un statut pour le changer · ✕ pour supprimer · « + » pour ajouter · 💾 sauvegarde / transfert entre appareils</div>
   <div class="card-base timeline" id="timelineCard">
     <div class="tl-head"><h3>🗓️ Rétroplanning de l'année</h3><button class="tl-add" onclick="addMs()">+ jalon</button></div>
-    <div class="tl-hint">Double-clique un intitulé ou une date pour l'éditer · clique la pastille pour changer le statut · ✕ pour retirer. Dates provisoires — le calendrier officiel du CNAM se débloque le 24 sept. 2026 : cale les dates ce jour-là.</div>
+    <div class="tl-hint">Double-clique un intitulé ou une date pour l'éditer · clique la pastille pour changer le statut · ✕ pour retirer. Calendrier officiel UAIP02 Moodle (25 sept. 2026) : sujet 31/10/26 · titre+sommaire 11/12/26 · brouillon 19/3/27 · dépôt S1 18/5/27 09h59 · soutenance S1 14/6/27 (sous réserve). S2 : dépôt 15/7/27 · soutenance 3/9/27. Aucun retard toléré (ajournement).</div>
     <div class="tl-scroll"><div class="tl-track" id="tlTrack"></div></div>
     <button class="blockdel" title="Supprimer ce bloc" onclick="delBlock('timeline','Rétroplanning de l\'année')" style="top:14px;right:16px">✕</button>
   </div>
@@ -245,18 +245,20 @@ const DEFAULT={
 hours:{base:25,sessions:[]},
  next:["Poursuivre les vignettes discordantes (score-first + re-cotation) jusqu'à ~10 cas.",
        "Commencer la rédaction de la Partie I — documentaire et juridique, aucun accès requis.",
-       "Récupérer le calendrier CNAM (24 sept.) et caler les dates du rétroplanning."],
+       "Sondage choix du sujet : avant le 31/10/26 09h59 (questionnaire mail + Moodle).",
+       "Titre + sommaire notés : avant le 11/12/26 09h59.",
+       "Brouillon structuré (plan détaillé + intention de résultats) : avant le 19/3/27 09h59."],
  hidden:{focus:false,global:false,next:false,timeline:false,chantiers:[]},
  months:["Sep 26","Oct","Nov","Déc","Jan 27","Fév","Mar","Avr","Mai","Juin"],
  milestones:[
-  {m:0.2,t:"Grille de cotation + Partie I", s:"prog"},
-  {m:1,  t:"Directeur attribué (CNAM)", s:"key"},
-  {m:2,  t:"Vérifs faisabilité SALVAC", s:"todo"},
-  {m:3,  t:"Pilote kappa + Partie II", s:"todo"},
-  {m:5,  t:"Accès données + Partie III", s:"todo"},
-  {m:7,  t:"Conclusion + relecture", s:"todo"},
-  {m:8.3,t:"⚠ DÉPÔT (aucun retard toléré)", s:"crit"},
-  {m:9.3,t:"Soutenance", s:"key"}
+  {m:0.15,t:"Modalités officielles UAIP02 intégrées", s:"done"},
+  {m:0.35,t:"Vignettes + amorcer Partie I", s:"prog"},
+  {m:1,   t:"Directeur attribué (CNAM)", s:"key"},
+  {m:1.95,t:"Choix du sujet (31/10/26 09h59)", s:"crit"},
+  {m:3.35,t:"Titre + sommaire (11/12/26)", s:"crit"},
+  {m:6.6, t:"Brouillon structuré (19/3/27)", s:"crit"},
+  {m:8.58,t:"⚠ DÉPÔT S1 (18/5/27 09h59)", s:"crit"},
+  {m:9.45,t:"Soutenance S1 (14/6/27, sous réserve)", s:"key"}
  ]
 };
 const KEY="dashboard_memoire_v2";
@@ -269,6 +271,12 @@ function normalize(){
   if(!STATE.months)STATE.months=JSON.parse(JSON.stringify(DEFAULT.months));
   if(!STATE.milestones)STATE.milestones=JSON.parse(JSON.stringify(DEFAULT.milestones));
   if(!STATE.next)STATE.next=JSON.parse(JSON.stringify(DEFAULT.next));
+  // Force-aligner la seule timeline sur le calendrier officiel UAIP02 (sans toucher tâches / heures).
+  if(STATE.calOfficiel!=="2026-09-25"){
+    STATE.months=JSON.parse(JSON.stringify(DEFAULT.months));
+    STATE.milestones=JSON.parse(JSON.stringify(DEFAULT.milestones));
+    STATE.calOfficiel="2026-09-25";
+  }
   if(!STATE.hours)STATE.hours={base:25,sessions:[]};
   if(STATE.hidden.hours===undefined)STATE.hidden.hours=false;
   STATE.tasks.forEach(function(d){d.s=STATUS_MAP[d.s]||(CYCLE.indexOf(d.s)>=0?d.s:"À faire");});
