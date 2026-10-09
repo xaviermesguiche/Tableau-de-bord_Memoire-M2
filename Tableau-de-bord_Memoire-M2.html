@@ -177,6 +177,7 @@
   <div class="toolbar">
     <button class="btn primary" onclick="window.print()">📄 Exporter en PDF</button>
     <button class="btn" onclick="saveGithub(false)">⬆ Enregistrer</button>
+    <button class="btn" onclick="loadGithub()">⬇ Recharger</button>
     <button class="btn" onclick="saveGithub(true)">Token</button>
     <button class="btn" onclick="resetAll()">↺ Réinitialiser</button>
   </div>
@@ -344,16 +345,21 @@ async function saveGithub(reconfig){
   const data=getJson();
   const url="https://api.github.com/repos/"+cfg.owner+"/"+cfg.repo+"/contents/"+cfg.path.split("/").map(encodeURIComponent).join("/");
   const headers={"Authorization":"Bearer "+cfg.token,"Accept":"application/vnd.github+json","Content-Type":"application/json"};
-  let sha=null;
   try{
-    const got=await fetch(url+"?ref="+encodeURIComponent(cfg.branch),{headers});
-    if(got.ok){sha=(await got.json()).sha;}
-    else if(got.status!==404){alert("Lecture impossible ("+got.status+"). Maj+clic sur GitHub pour ressaisir dépôt et token.");return;}
-    const body={message:"suivi mémoire "+new Date().toISOString().slice(0,16),content:btoa(unescape(encodeURIComponent(data))),branch:cfg.branch};
-    if(sha)body.sha=sha;
-    const put=await fetch(url,{method:"PUT",headers,body:JSON.stringify(body)});
-    if(!put.ok){const t=await put.text();alert("GitHub a refusé ("+put.status+"). "+t.slice(0,180));return;}
-    alert("Enregistré : "+cfg.owner+"/"+cfg.repo+" → "+cfg.path);
+    let lastText="";
+    for(let attempt=0;attempt<2;attempt++){
+      let sha=null;
+      const got=await fetch(url+"?ref="+encodeURIComponent(cfg.branch),{headers,cache:"no-store"});
+      if(got.ok){sha=(await got.json()).sha;}
+      else if(got.status!==404){alert("Lecture impossible ("+got.status+").");return;}
+      const body={message:"suivi mémoire "+new Date().toISOString().slice(0,16),content:btoa(unescape(encodeURIComponent(data))),branch:cfg.branch};
+      if(sha)body.sha=sha;
+      const put=await fetch(url,{method:"PUT",headers,body:JSON.stringify(body)});
+      if(put.ok){alert("Enregistré : "+cfg.owner+"/"+cfg.repo+" → "+cfg.path);return;}
+      lastText=await put.text();
+      if(put.status!==409){alert("GitHub a refusé ("+put.status+"). "+lastText.slice(0,180));return;}
+    }
+    alert("GitHub a refusé (409). Clique Enregistrer une seconde fois.");
   }catch(e){alert("Réseau ou CORS bloqué. Ouvre le fichier via un petit serveur local, pas en file://.");}
 }
 function render(){
@@ -586,7 +592,30 @@ function applyHidden(){
   const nx=document.querySelector('.next');if(nx)nx.style.display=STATE.hidden.next?'none':'';
 }
 function resetAll(){if(confirm("Remettre le tableau à son état initial ?\nToutes tes modifications seront perdues (pense à enregistrer sur GitHub d'abord si tu veux les garder).")){localStorage.removeItem(KEY);location.reload();}}
+async function loadGithub(silent){
+  const cfg=ghCfg();
+  const owner=cfg.owner||"xaviermesguiche";
+  const repo=cfg.repo||"Tableau-de-bord_Memoire-M2";
+  const path=cfg.path||"suivi-memoire.json";
+  const branch=cfg.branch||"main";
+  const raw="https://raw.githubusercontent.com/"+owner+"/"+repo+"/"+branch+"/"+path+"?t="+Date.now();
+  try{
+    let res=await fetch(raw,{cache:"no-store"});
+    if(!res.ok&&cfg.token){
+      const url="https://api.github.com/repos/"+owner+"/"+repo+"/contents/"+path+"?ref="+encodeURIComponent(branch);
+      res=await fetch(url,{headers:{"Authorization":"Bearer "+cfg.token,"Accept":"application/vnd.github.raw"},cache:"no-store"});
+    }
+    if(!res.ok){if(!silent)alert("Fichier introuvable sur GitHub ("+res.status+").");return;}
+    const obj=await res.json();
+    if(!obj.tasks){if(!silent)alert("Ce fichier n'est pas un suivi.");return;}
+    STATE=obj;normalize();save();
+    const box=document.getElementById('focusBox');if(box)box.value=STATE.focus||"";
+    render();renderPlan();renderTimeline();applyHidden();
+    if(!silent)alert("Suivi rechargé depuis GitHub.");
+  }catch(e){if(!silent)alert("Impossible de lire GitHub.");}
+}
 load();
+loadGithub(true);
 document.getElementById('focusBox').value=STATE.focus||"";
 try{if(STATE.lastVisit){const d=new Date(STATE.lastVisit);document.getElementById('lastVisit').textContent=d.toLocaleDateString('fr-FR',{day:'2-digit',month:'short'});}else{document.getElementById('lastVisit').textContent="aujourd'hui";}}catch(e){document.getElementById('lastVisit').textContent="aujourd'hui";}
 document.getElementById('focusBox').addEventListener('input',e=>{STATE.focus=e.target.value;save();flashSaved();});
