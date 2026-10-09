@@ -151,22 +151,25 @@
       "n": 1,
       "t": "Introduction — le projet et son contexte",
       "pages": 4,
-      "written": 2,
-      "s": "En cours"
+      "written": 4,
+      "s": "Validé",
+      "manual": false
     },
     {
       "n": 2,
       "t": "Définition du sujet et de la problématique",
       "pages": 2,
       "written": 1,
-      "s": "En cours"
+      "s": "En cours",
+      "manual": false
     },
     {
       "n": 3,
       "t": "Objectifs du mémoire",
       "pages": 2,
-      "written": 0,
-      "s": "À faire"
+      "written": 1,
+      "s": "En cours",
+      "manual": false
     },
     {
       "n": 4,
@@ -179,8 +182,9 @@
       "n": 5,
       "t": "Démarche méthodologique",
       "pages": 6,
-      "written": 0,
-      "s": "À faire"
+      "written": 3,
+      "s": "En cours",
+      "manual": false
     },
     {
       "n": 6,
@@ -197,7 +201,8 @@
       "t": "Conclusion — perspectives et limites",
       "pages": 4,
       "written": 0,
-      "s": "À faire"
+      "s": "À faire",
+      "manual": false
     }
   ],
   "next": [
@@ -270,5 +275,5 @@
     }
   ],
   "calOfficiel": "2026-09-25",
-  "lastVisit": "2026-10-09T09:39:52.748Z"
+  "lastVisit": "2026-10-09T10:09:36.844Z"
 }
