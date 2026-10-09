@@ -167,8 +167,8 @@
       "n": 3,
       "t": "Objectifs du mémoire",
       "pages": 2,
-      "written": 1,
-      "s": "En cours",
+      "written": 2,
+      "s": "Validé",
       "manual": false
     },
     {
@@ -275,5 +275,5 @@
     }
   ],
   "calOfficiel": "2026-09-25",
-  "lastVisit": "2026-10-09T16:20:36.053Z"
+  "lastVisit": "2026-10-09T21:01:11.692Z"
 }
