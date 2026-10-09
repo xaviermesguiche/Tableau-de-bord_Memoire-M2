@@ -1,0 +1,274 @@
+{
+  "tasks": [
+    {
+      "g": "Cadrage",
+      "t": "Sujet, problématique, variable (horloge t0→t1)",
+      "s": "Validé"
+    },
+    {
+      "g": "Cadrage",
+      "t": "Proposition réfutable (Davis) + distinction difficulté/dispositif",
+      "s": "Validé"
+    },
+    {
+      "g": "Cadrage",
+      "t": "Typologie des 4 cécités",
+      "s": "Validé"
+    },
+    {
+      "g": "Cadrage",
+      "t": "Angle longitudinal 2007→2026 (DACG / Dallest)",
+      "s": "Validé"
+    },
+    {
+      "g": "Cadrage",
+      "t": "Fil conducteur Pinatel / Bauer",
+      "s": "Validé"
+    },
+    {
+      "g": "Indice",
+      "t": "D1 — Contrainte spatiale (nb de communes)",
+      "s": "Validé"
+    },
+    {
+      "g": "Indice",
+      "t": "D2 — Contrainte temporelle (ancienneté du fait le + ancien)",
+      "s": "Validé"
+    },
+    {
+      "g": "Indice",
+      "t": "D3 — Variabilité du MO (lieu + moyen)",
+      "s": "Validé"
+    },
+    {
+      "g": "Indice",
+      "t": "D4 — Qualité des traces (hors SALVAC → argument de thèse)",
+      "s": "À faire"
+    },
+    {
+      "g": "Indice",
+      "t": "D5 — Nombre de victimes (circulaire)",
+      "s": "À faire"
+    },
+    {
+      "g": "Indice",
+      "t": "Figer la grille de cotation 0/1/2",
+      "s": "Validé"
+    },
+    {
+      "g": "Indice",
+      "t": "Construire les vignettes (cas fictifs)",
+      "s": "En cours"
+    },
+    {
+      "g": "Indice",
+      "t": "Pilote kappa inter-codeurs (script Python)",
+      "s": "À faire"
+    },
+    {
+      "g": "Accès",
+      "t": "Projet de recherche envoyé au directeur pressenti",
+      "s": "Validé"
+    },
+    {
+      "g": "Accès",
+      "t": "Relance directeur pressenti (si silence)",
+      "s": "En cours"
+    },
+    {
+      "g": "Accès",
+      "t": "Attribution du directeur par le CNAM (octobre)",
+      "s": "En cours"
+    },
+    {
+      "g": "Accès",
+      "t": "Contact accès données SALVAC",
+      "s": "En cours"
+    },
+    {
+      "g": "Accès",
+      "t": "Vérifier : lieu (commune) + dates exploitables dans SALVAC",
+      "s": "À faire"
+    },
+    {
+      "g": "Accès",
+      "t": "Vérifier : horodatages t0 / t1 extractibles",
+      "s": "À faire"
+    },
+    {
+      "g": "Sources",
+      "t": "Bibliographie consolidée (+ Marin 2003, Davies 2018)",
+      "s": "En cours"
+    },
+    {
+      "g": "Sources",
+      "t": "Margot 2009 (via Davies uniquement)",
+      "s": "En cours"
+    },
+    {
+      "g": "Sources",
+      "t": "Sources Chopin & Aebi (accès OCRVP, biais 71,64 %)",
+      "s": "Validé"
+    },
+    {
+      "g": "Rédaction",
+      "t": "Introduction (propos liminaires)",
+      "s": "Validé"
+    },
+    {
+      "g": "Rédaction",
+      "t": "Plan détaillé (3 parties, fil Bauer, grille CNAM)",
+      "s": "Validé"
+    },
+    {
+      "g": "Rédaction",
+      "t": "Partie I — Dispositifs & cécités (rédigeable maintenant)",
+      "s": "À faire"
+    },
+    {
+      "g": "Rédaction",
+      "t": "Partie II — Construire la mesure",
+      "s": "À faire"
+    },
+    {
+      "g": "Rédaction",
+      "t": "Partie III — Faisabilité, résultats, discussion",
+      "s": "À faire"
+    },
+    {
+      "g": "Rédaction",
+      "t": "Conclusion & recommandations",
+      "s": "À faire"
+    }
+  ],
+  "focus": "",
+  "hours": {
+    "base": 25,
+    "sessions": []
+  },
+  "plan": [
+    {
+      "n": 1,
+      "t": "Introduction — le projet et son contexte",
+      "pages": 4,
+      "written": 2,
+      "s": "En cours"
+    },
+    {
+      "n": 2,
+      "t": "Définition du sujet et de la problématique",
+      "pages": 2,
+      "written": 1,
+      "s": "En cours"
+    },
+    {
+      "n": 3,
+      "t": "Objectifs du mémoire",
+      "pages": 2,
+      "written": 0,
+      "s": "À faire"
+    },
+    {
+      "n": 4,
+      "t": "État de l'art / revue de littérature",
+      "pages": 15,
+      "written": 8,
+      "s": "En cours"
+    },
+    {
+      "n": 5,
+      "t": "Démarche méthodologique",
+      "pages": 6,
+      "written": 0,
+      "s": "À faire"
+    },
+    {
+      "n": 6,
+      "t": "Résultats et contributions attendus",
+      "pages": 35,
+      "pmin": 30,
+      "pmax": 40,
+      "written": 0,
+      "s": "À faire",
+      "bulk": true
+    },
+    {
+      "n": 7,
+      "t": "Conclusion — perspectives et limites",
+      "pages": 4,
+      "written": 0,
+      "s": "À faire"
+    }
+  ],
+  "next": [
+    "Poursuivre les vignettes discordantes (score-first + re-cotation) jusqu'à ~10 cas.",
+    "Commencer la rédaction de la Partie I — documentaire et juridique, aucun accès requis.",
+    "Sondage choix du sujet : avant le 31/10/26 09h59 (questionnaire mail + Moodle).",
+    "Titre + sommaire notés : avant le 11/12/26 09h59.",
+    "Brouillon structuré (plan détaillé + intention de résultats) : avant le 19/3/27 09h59."
+  ],
+  "hidden": {
+    "focus": false,
+    "global": false,
+    "next": false,
+    "timeline": false,
+    "chantiers": [],
+    "hours": false
+  },
+  "months": [
+    "Sep 26",
+    "Oct",
+    "Nov",
+    "Déc",
+    "Jan 27",
+    "Fév",
+    "Mar",
+    "Avr",
+    "Mai",
+    "Juin"
+  ],
+  "milestones": [
+    {
+      "m": 0.15,
+      "t": "Modalités officielles UAIP02 intégrées",
+      "s": "done"
+    },
+    {
+      "m": 0.35,
+      "t": "Vignettes + amorcer Partie I",
+      "s": "prog"
+    },
+    {
+      "m": 1,
+      "t": "Directeur attribué (CNAM)",
+      "s": "key"
+    },
+    {
+      "m": 1.95,
+      "t": "Choix du sujet (31/10/26 09h59)",
+      "s": "crit"
+    },
+    {
+      "m": 3.35,
+      "t": "Titre + sommaire (11/12/26)",
+      "s": "crit"
+    },
+    {
+      "m": 6.6,
+      "t": "Brouillon structuré (19/3/27)",
+      "s": "crit"
+    },
+    {
+      "m": 8.58,
+      "t": "⚠ DÉPÔT S1 (18/5/27 09h59)",
+      "s": "crit"
+    },
+    {
+      "m": 9.45,
+      "t": "Soutenance S1 (14/6/27, sous réserve)",
+      "s": "key"
+    }
+  ],
+  "calOfficiel": "2026-09-25",
+  "lastVisit": "2026-10-09T09:39:52.748Z"
+}
