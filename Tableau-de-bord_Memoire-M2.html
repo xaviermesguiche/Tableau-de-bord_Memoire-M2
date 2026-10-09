@@ -46,17 +46,31 @@
   .focus{width:100%;border:1.5px dashed #e3d4ee;background:rgba(255,255,255,.6);border-radius:12px;padding:10px 12px;font-family:inherit;font-size:13.5px;color:var(--ink);resize:vertical;min-height:60px}
   .focus:focus{outline:none;border-color:#c3ade4}
   .savednote{font-size:11px;color:var(--soft);margin-top:6px;height:14px}
-  .global{padding:24px 26px;padding-right:44px;margin-bottom:22px;display:flex;align-items:center;gap:30px;flex-wrap:wrap}
-  .ring{--p:0;width:140px;height:140px;border-radius:50%;flex:0 0 auto;position:relative;
-        background:conic-gradient(#7cc492 calc(var(--p)*1%), #ece6f0 0);display:flex;align-items:center;justify-content:center;transition:background .6s}
-  .ring::before{content:"";position:absolute;width:104px;height:104px;background:#fff;border-radius:50%;box-shadow:inset 0 2px 6px rgba(150,120,160,.12)}
-  .ring b{position:relative;font-size:32px;color:#7cae8e;font-weight:800}
-  .ring small{position:relative;display:block;text-align:center;font-size:10px;color:var(--soft);font-weight:700;letter-spacing:1px}
-  .gtext{flex:1;min-width:220px}.gtext h2{font-size:17px;margin-bottom:12px}
-  .pills{display:flex;gap:8px;flex-wrap:wrap}
-  .pill{font-size:12px;font-weight:700;padding:6px 13px;border-radius:20px}
-  .k-done{background:var(--greenbg);color:var(--doneink)}.k-prog{background:var(--peachbg);color:var(--progink)}
-  .k-wait{background:var(--pinkbg);color:var(--waitink)}.k-todo{background:var(--bluebg);color:var(--todoink)}.k-skip{background:#f0eef2;color:var(--skipink)}
+  .global{padding:22px 24px;padding-right:44px;margin-bottom:22px;display:block}
+  .ghead{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+  .ghead h2{font-size:17px;margin:0}
+  .gmeta{font-size:12px;color:var(--soft);font-weight:700}
+  .chain-hint{font-size:11.5px;color:var(--soft);font-style:italic;margin:0 0 14px}
+  .chain{display:flex;align-items:stretch;gap:0;overflow-x:auto;padding:4px 2px 8px}
+  .pnode{flex:1 1 0;min-width:118px;position:relative;background:#fff;border:1.5px solid #e6e0eb;border-radius:14px;padding:10px 10px 8px;margin:0 6px;cursor:pointer;text-align:left}
+  .pnode:first-child{margin-left:0}
+  .pnode.bulk{background:#c0392b;border-color:#c0392b;color:#fff}
+  .pnode.bulk .pn-pages,.pnode.bulk .pn-st{color:#ffe08a}
+  .pnode.st-done{border-color:#7cc492;box-shadow:inset 4px 0 0 #7cc492}
+  .pnode.st-prog{border-color:#e0a15a;box-shadow:inset 4px 0 0 #e0a15a}
+  .pnode.bulk.st-done,.pnode.bulk.st-prog{box-shadow:none}
+  .pn-n{font-size:11px;font-weight:800;letter-spacing:.4px;opacity:.7}
+  .pn-t{font-size:12.5px;font-weight:800;line-height:1.25;margin:4px 0 8px;min-height:48px}
+  .pn-pages{font-size:12px;font-weight:800;color:#3d6ea8}
+  .pn-pages span{cursor:text;border-bottom:1px dashed currentColor}
+  .pn-st{margin-top:6px;font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;color:var(--soft)}
+  .vol{margin-top:14px}
+  .vol-top{display:flex;justify-content:space-between;font-size:12px;font-weight:700;margin-bottom:6px}
+  .volbar{position:relative;height:16px;background:#ece6f0;border-radius:10px;overflow:hidden}
+  .volbar .fill{height:100%;background:#7cc492;width:0;border-radius:10px}
+  .volbar .zone{position:absolute;top:0;bottom:0;background:rgba(212,168,32,.28);border-left:2px solid #d4a820;border-right:2px solid #d4a820}
+  .volnote{margin-top:10px;background:#e8b423;color:#1a1408;font-weight:800;font-size:13px;border-radius:10px;padding:8px 12px}
+  .volfoot{margin-top:8px;font-size:11px;color:var(--soft)}
   h4.section{font-size:12px;text-transform:uppercase;letter-spacing:1.5px;color:var(--soft);margin:24px 6px 12px;font-weight:800}
   .chantier{padding:18px 22px;margin-bottom:16px;border-left:7px solid var(--c)}
   .chead{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:11px;padding-right:34px}
@@ -162,12 +176,10 @@
   </header>
   <div class="toolbar">
     <button class="btn primary" onclick="window.print()">📄 Exporter en PDF</button>
-    <button class="btn" onclick="exportData()">💾 Exporter</button>
-    <button class="btn" onclick="document.getElementById('importFile').click()">📥 Importer</button>
-    <input type="file" id="importFile" accept=".json,application/json,text/plain" style="display:none" onchange="importData(this)">
+    <button class="btn" onclick="saveGithub()">⬆ GitHub</button>
     <button class="btn" onclick="resetAll()">↺ Réinitialiser</button>
   </div>
-  <div class="hintbar">✏️ Double-clique un texte pour le modifier · clique un statut pour le changer · ✕ pour supprimer · « + » pour ajouter · 💾 sauvegarde / transfert entre appareils</div>
+  <div class="hintbar">✏️ Double-clique un texte pour le modifier · clique un statut pour le changer · ✕ pour supprimer · « + » pour ajouter · ⬆ GitHub pour enregistrer le suivi</div>
   <div class="card-base timeline" id="timelineCard">
     <div class="tl-head"><h3>🗓️ Rétroplanning de l'année</h3><button class="tl-add" onclick="addMs()">+ jalon</button></div>
     <div class="tl-hint">Double-clique un intitulé ou une date pour l'éditer · clique la pastille pour changer le statut · ✕ pour retirer. Calendrier officiel UAIP02 Moodle (25 sept. 2026) : sujet 31/10/26 · titre+sommaire 11/12/26 · brouillon 19/3/27 · dépôt S1 18/5/27 09h59 · soutenance S1 14/6/27 (sous réserve). S2 : dépôt 15/7/27 · soutenance 3/9/27. Aucun retard toléré (ajournement).</div>
@@ -182,9 +194,16 @@
       <div class="savednote" id="savedNote"></div>
     </div>
   </div>
-  <div class="card-base global">
-    <div class="ring" id="ring"><b id="ringPct">0%</b><small>ACHEVÉ</small></div>
-    <div class="gtext"><h2>Ma progression</h2><div class="pills" id="pills"></div></div>
+  <div class="card-base global" id="planCard">
+    <div class="ghead"><h2>Cheminement du mémoire</h2><span class="gmeta" id="planMeta">—</span></div>
+    <p class="chain-hint">Clique une étape : À faire = 0 p., En cours = la moitié, Validé = le volume de l’étape (l’étape 6 compte 35 p., milieu de 30–40). La jauge suit. Double-clic sur le nombre pour saisir un volume réel.</p>
+    <div class="chain" id="planChain"></div>
+    <div class="vol">
+      <div class="vol-top"><span id="volLabel">Volume rédigé</span><span id="volNums">0 p. · 0 mots</span></div>
+      <div class="volbar"><div class="zone" style="left:86%;width:14%"></div><div class="fill" id="volFill"></div></div>
+      <div class="volnote" id="volNote">Total attendu : 63 à 73 pages, hors bibliographie et annexes</div>
+      <div class="volfoot">En dessous de 63 p. : renvoi en session 2 ou ajournement possible. Au-dessus de 73 : la maîtrise du volume compte aussi dans la note. Mots = pages × <span id="wpp" ondblclick="editWpp(this)" title="Double-clic pour changer le ratio">300</span> (page Times 12, interligne 1,5 — le Cnam note les pages, pas les mots).</div>
+    </div>
   </div>
   <div class="card-base hours" id="hoursCard">
     <div class="hours-head"><h3>⏱️ Temps investi</h3><button class="tl-add" onclick="addSession()">+ session</button></div>
@@ -242,7 +261,16 @@ const DEFAULT={
   {g:"Rédaction",t:"Conclusion & recommandations",s:"À faire"},
  ],
  focus:"",
-hours:{base:25,sessions:[]},
+ hours:{base:25,sessions:[]},
+ plan:[
+  {n:1,t:"Introduction — le projet et son contexte",pages:4,written:0,s:"En cours"},
+  {n:2,t:"Définition du sujet et de la problématique",pages:2,written:0,s:"En cours"},
+  {n:3,t:"Objectifs du mémoire",pages:2,written:0,s:"À faire"},
+  {n:4,t:"État de l'art / revue de littérature",pages:15,written:0,s:"En cours"},
+  {n:5,t:"Démarche méthodologique",pages:6,written:0,s:"À faire"},
+  {n:6,t:"Résultats et contributions attendus",pages:35,pmin:30,pmax:40,written:0,s:"À faire",bulk:true},
+  {n:7,t:"Conclusion — perspectives et limites",pages:4,written:0,s:"À faire"}
+ ],
  next:["Poursuivre les vignettes discordantes (score-first + re-cotation) jusqu'à ~10 cas.",
        "Commencer la rédaction de la Partie I — documentaire et juridique, aucun accès requis.",
        "Sondage choix du sujet : avant le 31/10/26 09h59 (questionnaire mail + Moodle).",
@@ -278,6 +306,7 @@ function normalize(){
     STATE.calOfficiel="2026-09-25";
   }
   if(!STATE.hours)STATE.hours={base:25,sessions:[]};
+  if(!STATE.plan||STATE.plan.length!==7)STATE.plan=JSON.parse(JSON.stringify(DEFAULT.plan));
   if(STATE.hidden.hours===undefined)STATE.hidden.hours=false;
   STATE.tasks.forEach(function(d){d.s=STATUS_MAP[d.s]||(CYCLE.indexOf(d.s)>=0?d.s:"À faire");});
 }
@@ -291,60 +320,41 @@ function flashSaved(){const n=document.getElementById('savedNote');n.textContent
 
 function getJson(){save();return JSON.stringify(STATE,null,2);}
 function fileName(){return "suivi-memoire_"+new Date().toISOString().slice(0,10)+".json";}
-function exportData(){
-  const data=getJson();
-  const blob=new Blob([data],{type:"application/json"});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url;a.download=fileName();
-  document.body.appendChild(a);a.click();a.remove();
-  setTimeout(function(){URL.revokeObjectURL(url);},1500);
+function ghCfg(){
+  try{return JSON.parse(localStorage.getItem("dashboard_github")||"{}");}catch(e){return {};}
 }
-async function copyData(){
-  const data=getJson();
-  try{
-    await navigator.clipboard.writeText(data);
-    alert("JSON copié. Colle-le dans Dropbox, Drive, Keep ou un mail.");
-  }catch(e){
-    prompt("Sélectionne tout et copie :", data);
+async function saveGithub(reconfig){
+  const cur=ghCfg();
+  let cfg=cur;
+  if(reconfig||!cur.owner||!cur.repo||!cur.path||!cur.branch||!cur.token){
+    const owner=prompt("Dépôt GitHub — propriétaire (user ou orga)", cur.owner||"");
+    if(!owner)return;
+    const repo=prompt("Nom du dépôt", cur.repo||"");
+    if(!repo)return;
+    const path=prompt("Chemin du fichier dans le dépôt", cur.path||"suivi-memoire.json");
+    if(!path)return;
+    const branch=prompt("Branche", cur.branch||"main");
+    if(!branch)return;
+    const token=prompt("Token GitHub (scope repo, fine-grained : Contents en écriture).\nIl reste dans ce navigateur seulement.", cur.token||"");
+    if(!token)return;
+    cfg={owner,repo,path,branch,token};
+    localStorage.setItem("dashboard_github", JSON.stringify(cfg));
   }
-}
-async function shareData(){
   const data=getJson();
-  const name=fileName();
-  const file=new File([data],name,{type:"application/json"});
+  const url="https://api.github.com/repos/"+cfg.owner+"/"+cfg.repo+"/contents/"+cfg.path.split("/").map(encodeURIComponent).join("/");
+  const headers={"Authorization":"Bearer "+cfg.token,"Accept":"application/vnd.github+json","Content-Type":"application/json"};
+  let sha=null;
   try{
-    if(navigator.canShare && navigator.canShare({files:[file]})){
-      await navigator.share({title:"Suivi mémoire M2",text:"Sauvegarde tableau de bord",files:[file]});
-      return;
-    }
-    if(navigator.share){
-      await navigator.share({title:"Suivi mémoire M2",text:data});
-      return;
-    }
-  }catch(e){
-    if(e && e.name==="AbortError") return;
-  }
-  exportData();
-  alert("Si le bouton était gris : le fichier est téléchargé.\nEnsuite ouvre Dropbox → Importer / Enregistrer dans Dropbox.");
+    const got=await fetch(url+"?ref="+encodeURIComponent(cfg.branch),{headers});
+    if(got.ok){sha=(await got.json()).sha;}
+    else if(got.status!==404){alert("Lecture impossible ("+got.status+"). Maj+clic sur GitHub pour ressaisir dépôt et token.");return;}
+    const body={message:"suivi mémoire "+new Date().toISOString().slice(0,16),content:btoa(unescape(encodeURIComponent(data))),branch:cfg.branch};
+    if(sha)body.sha=sha;
+    const put=await fetch(url,{method:"PUT",headers,body:JSON.stringify(body)});
+    if(!put.ok){alert("Envoi refusé ("+put.status+"). Maj+clic sur GitHub pour ressaisir le token.");return;}
+    alert("Enregistré : "+cfg.owner+"/"+cfg.repo+" → "+cfg.path);
+  }catch(e){alert("Réseau ou CORS bloqué. Ouvre le fichier via un petit serveur local, pas en file://.");}
 }
-function importData(input){
-  const file=input.files[0];if(!file)return;
-  const reader=new FileReader();
-  reader.onload=function(e){
-    try{
-      const obj=JSON.parse(e.target.result);
-      if(!obj.tasks){alert("Ce fichier ne semble pas être une sauvegarde valide.");return;}
-      STATE=obj;normalize();save();
-      document.getElementById('focusBox').value=STATE.focus||"";
-      render();renderTimeline();applyHidden();
-      alert("Sauvegarde importée avec succès. ✓");
-    }catch(err){alert("Impossible de lire ce fichier (JSON invalide).");}
-  };
-  reader.readAsText(file);
-  input.value="";
-}
-
 function render(){
   GROUPS=ALLGROUPS.filter(g=>!(STATE.hidden.chantiers||[]).includes(g));
   const cont=document.getElementById('chantiers');cont.innerHTML="";
@@ -368,22 +378,90 @@ function render(){
     html+=`</div><button class="addbtn" onclick="addTask('${g}')">+ ajouter une tâche</button>`;
     div.innerHTML=html;cont.appendChild(div);
   });
-  const counted=STATE.tasks;
-  const done=counted.filter(d=>DONE.includes(d.s)).length;
-  const gpct=counted.length?Math.round(done/counted.length*100):0;
-  document.getElementById('ring').style.setProperty('--p',gpct);
-  document.getElementById('ringPct').textContent=gpct+"%";
-  const cnt=s=>STATE.tasks.filter(d=>d.s===s).length;
-  const nd=STATE.tasks.filter(d=>DONE.includes(d.s)).length;
-  document.getElementById('pills').innerHTML=
-    `<span class="pill k-done">${nd} validé</span>
-     <span class="pill k-prog">${cnt("En cours")} en cours</span>
-     <span class="pill k-todo">${cnt("À faire")} à faire</span>`;
+  renderPlan();
   const nl=document.getElementById('nextlist');nl.innerHTML="";
   STATE.next.forEach((txt,i)=>{
     nl.innerHTML+=`<div class="step"><span class="num">${i+1}</span>
       <span class="steptxt" ondblclick="editNext(this,${i})" title="Double-clique pour modifier">${escapeHtml(txt)}</span></div>`;
   });
+}
+function pagesFor(p){
+  if(p.manual)return Number(p.written)||0;
+  if(p.s==="Validé")return p.pages;
+  if(p.s==="En cours")return Math.round(p.pages/2);
+  return 0;
+}
+function renderPlan(){
+  const box=document.getElementById('planChain');if(!box||!STATE.plan)return;
+  box.innerHTML="";
+  let written=0, doneN=0;
+  STATE.plan.forEach((p,i)=>{
+    if(!p.manual)p.written=pagesFor(p);
+    const got=Number(p.written)||0;
+    written+=got;
+    if(p.s==="Validé")doneN++;
+    const label=p.bulk?"30–40 p.":(p.pages+" p.");
+    const el=document.createElement('div');
+    el.className='pnode'+(p.bulk?' bulk':'')+(p.s==="Validé"?' st-done':p.s==="En cours"?' st-prog':'');
+    el.innerHTML=`<div class="pn-n">${p.n} / 7</div>
+      <div class="pn-t">${escapeHtml(p.t)}</div>
+      <div class="pn-pages"><span ondblclick="editPages(event,${i})" title="Pages comptées — double-clic pour ajuster">${got}</span> / ${label}</div>
+      <div class="pn-st">${escapeHtml(p.s)}</div>`;
+    el.onclick=()=>cyclePlan(i);
+    box.appendChild(el);
+  });
+  const meta=document.getElementById('planMeta');
+  if(meta)meta.textContent=doneN+"/7 étapes validées · "+written+" p. comptées";
+  const wpp=STATE.wordsPerPage||300;
+  const mots=Math.round(written*wpp);
+  const nums=document.getElementById('volNums');
+  if(nums)nums.textContent=written+" p. · "+mots.toLocaleString('fr-FR')+" mots  (cible "+(63*wpp).toLocaleString('fr-FR')+"–"+(73*wpp).toLocaleString('fr-FR')+")";
+  const wppEl=document.getElementById('wpp');
+  if(wppEl)wppEl.textContent=wpp;
+  const fill=document.getElementById('volFill');
+  if(fill){
+    const pct=Math.min(100,Math.round(written/73*100));
+    fill.style.width=pct+"%";
+    fill.style.background=written<63?"#e07a3d":(written>73?"#c0392b":"#7cc492");
+  }
+  const note=document.getElementById('volNote');
+  if(note){
+    if(written<63)note.textContent="Total attendu : 63 à 73 pages — il manque "+(63-written)+" p. pour le plancher (hors biblio et annexes).";
+    else if(written>73)note.textContent="Au-dessus de 73 pages : la maîtrise du volume compte aussi dans la note.";
+    else note.textContent="Dans la fourchette : "+written+" pages, cible 63 à 73 hors bibliographie et annexes.";
+  }
+}
+function editWpp(el){
+  el.setAttribute('contenteditable','true');el.focus();
+  const fin=()=>{
+    el.removeAttribute('contenteditable');
+    const v=parseFloat(String(el.textContent).replace(',','.'));
+    STATE.wordsPerPage=(!v||v<50)?300:Math.round(v);
+    save();renderPlan();
+  };
+  el.onblur=fin;
+  el.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();el.blur();}};
+}
+function cyclePlan(i){
+  const c=CYCLE.indexOf(STATE.plan[i].s);
+  STATE.plan[i].s=CYCLE[(c<0?0:c+1)%CYCLE.length];
+  STATE.plan[i].manual=false;
+  STATE.plan[i].written=pagesFor(STATE.plan[i]);
+  save();renderPlan();
+}
+function editPages(ev,i){
+  ev.stopPropagation();
+  const el=ev.currentTarget;
+  el.setAttribute('contenteditable','true');el.focus();
+  const fin=()=>{
+    el.removeAttribute('contenteditable');
+    const v=parseFloat(String(el.textContent).replace(',','.'));
+    STATE.plan[i].written=isNaN(v)?0:Math.max(0,v);
+    STATE.plan[i].manual=true;
+    save();renderPlan();
+  };
+  el.onblur=fin;
+  el.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();el.blur();}};
 }
 const MSCYCLE=[["todo","À faire"],["prog","En cours"],["wait","En attente"],["done","Fait"],["key","Jalon clé"],["crit","Critique"]];
 function msNextStatus(cur){const i=MSCYCLE.findIndex(x=>x[0]===cur);return MSCYCLE[(i+1)%MSCYCLE.length][0];}
@@ -506,7 +584,7 @@ function applyHidden(){
   const gb=document.querySelector('.global');if(gb)gb.style.display=STATE.hidden.global?'none':'';
   const nx=document.querySelector('.next');if(nx)nx.style.display=STATE.hidden.next?'none':'';
 }
-function resetAll(){if(confirm("Remettre le tableau à son état initial ?\nToutes tes modifications seront perdues (pense à Exporter d'abord si tu veux les garder).")){localStorage.removeItem(KEY);location.reload();}}
+function resetAll(){if(confirm("Remettre le tableau à son état initial ?\nToutes tes modifications seront perdues (pense à enregistrer sur GitHub d'abord si tu veux les garder).")){localStorage.removeItem(KEY);location.reload();}}
 load();
 document.getElementById('focusBox').value=STATE.focus||"";
 try{if(STATE.lastVisit){const d=new Date(STATE.lastVisit);document.getElementById('lastVisit').textContent=d.toLocaleDateString('fr-FR',{day:'2-digit',month:'short'});}else{document.getElementById('lastVisit').textContent="aujourd'hui";}}catch(e){document.getElementById('lastVisit').textContent="aujourd'hui";}
