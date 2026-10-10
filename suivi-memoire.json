@@ -141,9 +141,9 @@
       "s": "À faire"
     }
   ],
-  "focus": "Poursuivre la timeline et faire la revue de littérature ",
+  "focus": "Revue de la littérature",
   "hours": {
-    "base": 25,
+    "base": 50,
     "sessions": []
   },
   "plan": [
@@ -275,5 +275,5 @@
     }
   ],
   "calOfficiel": "2026-09-25",
-  "lastVisit": "2026-10-10T08:03:32.616Z"
+  "lastVisit": "2026-10-10T08:07:52.020Z"
 }
