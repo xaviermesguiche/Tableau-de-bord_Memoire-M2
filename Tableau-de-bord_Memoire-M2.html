@@ -201,10 +201,10 @@
     <p class="chain-hint">Clique une étape : À faire = 0 p., En cours = la moitié, Validé = le volume de l’étape (l’étape 6 compte 35 p., milieu de 30–40). La jauge suit. Double-clic sur le nombre pour saisir un volume réel.</p>
     <div class="chain" id="planChain"></div>
     <div class="vol">
-      <div class="vol-top"><span id="volLabel">Volume rédigé</span><span id="volNums">0 p. · 0 mots</span></div>
+      <div class="vol-top"><span id="volLabel">Volume rédigé</span><span id="volNums">0 / 63–73 p.</span></div>
       <div class="volbar"><div class="zone" style="left:86%;width:14%"></div><div class="fill" id="volFill"></div></div>
       <div class="volnote" id="volNote">Total attendu : 63 à 73 pages, hors bibliographie et annexes</div>
-      <div class="volfoot">En dessous de 63 p. : renvoi en session 2 ou ajournement possible. Au-dessus de 73 : la maîtrise du volume compte aussi dans la note. Mots = pages × <span id="wpp" ondblclick="editWpp(this)" title="Double-clic pour changer le ratio">300</span> (page Times 12, interligne 1,5 — le Cnam note les pages, pas les mots).</div>
+      <div class="volfoot">En dessous de 63 p. : renvoi en session 2 ou ajournement possible. Au-dessus de 73 : la maîtrise du volume compte aussi dans la note. L’étape 6 porte l’essentiel (30–40 p.).</div>
     </div>
   </div>
   <div class="card-base hours" id="hoursCard">
@@ -419,12 +419,8 @@ function renderPlan(){
   });
   const meta=document.getElementById('planMeta');
   if(meta)meta.textContent=doneN+"/7 étapes validées · "+written+" p. comptées";
-  const wpp=STATE.wordsPerPage||300;
-  const mots=Math.round(written*wpp);
   const nums=document.getElementById('volNums');
-  if(nums)nums.textContent=written+" p. · "+mots.toLocaleString('fr-FR')+" mots  (cible "+(63*wpp).toLocaleString('fr-FR')+"–"+(73*wpp).toLocaleString('fr-FR')+")";
-  const wppEl=document.getElementById('wpp');
-  if(wppEl)wppEl.textContent=wpp;
+  if(nums)nums.textContent=written+" / 63–73 p.";
   const fill=document.getElementById('volFill');
   if(fill){
     const pct=Math.min(100,Math.round(written/73*100));
@@ -437,17 +433,6 @@ function renderPlan(){
     else if(written>73)note.textContent="Au-dessus de 73 pages : la maîtrise du volume compte aussi dans la note.";
     else note.textContent="Dans la fourchette : "+written+" pages, cible 63 à 73 hors bibliographie et annexes.";
   }
-}
-function editWpp(el){
-  el.setAttribute('contenteditable','true');el.focus();
-  const fin=()=>{
-    el.removeAttribute('contenteditable');
-    const v=parseFloat(String(el.textContent).replace(',','.'));
-    STATE.wordsPerPage=(!v||v<50)?300:Math.round(v);
-    save();renderPlan();
-  };
-  el.onblur=fin;
-  el.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();el.blur();}};
 }
 function cyclePlan(i){
   const c=CYCLE.indexOf(STATE.plan[i].s);
