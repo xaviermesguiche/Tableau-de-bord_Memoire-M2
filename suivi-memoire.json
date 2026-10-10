@@ -123,12 +123,12 @@
     {
       "g": "Rédaction",
       "t": "Objectifs du mémoire",
-      "s": "À faire"
+      "s": "Validé"
     },
     {
       "g": "Rédaction",
       "t": "État de l'art / revue de littérature",
-      "s": "À faire"
+      "s": "En cours"
     },
     {
       "g": "Rédaction",
@@ -181,14 +181,15 @@
       "t": "État de l'art / revue de littérature",
       "pages": 15,
       "written": 8,
-      "s": "En cours"
+      "s": "En cours",
+      "manual": false
     },
     {
       "n": 5,
       "t": "Démarche méthodologique",
       "pages": 6,
-      "written": 3,
-      "s": "En cours",
+      "written": 0,
+      "s": "À faire",
       "manual": false
     },
     {
@@ -285,5 +286,5 @@
     }
   ],
   "calOfficiel": "2026-09-25",
-  "lastVisit": "2026-10-10T21:44:53.095Z"
+  "lastVisit": "2026-10-10T21:45:41.207Z"
 }
