@@ -112,32 +112,37 @@
     },
     {
       "g": "Rédaction",
-      "t": "Introduction (propos liminaires)",
+      "t": "Introduction : le projet et son contexte",
       "s": "Validé"
     },
     {
       "g": "Rédaction",
-      "t": "Plan détaillé (3 parties, fil Bauer, grille CNAM)",
+      "t": "Définition du sujet et de la problématique",
       "s": "Validé"
     },
     {
       "g": "Rédaction",
-      "t": "Partie I — Dispositifs & cécités (rédigeable maintenant)",
+      "t": "Objectifs du mémoire",
       "s": "À faire"
     },
     {
       "g": "Rédaction",
-      "t": "Partie II — Construire la mesure",
+      "t": "État de l'art / revue de littérature",
       "s": "À faire"
     },
     {
       "g": "Rédaction",
-      "t": "Partie III — Faisabilité, résultats, discussion",
+      "t": "Démarche méthodologique",
       "s": "À faire"
     },
     {
       "g": "Rédaction",
-      "t": "Conclusion & recommandations",
+      "t": "Résultats et contributions attendues",
+      "s": "À faire"
+    },
+    {
+      "g": "Rédaction",
+      "t": "Conclusion : perspectives et limites",
       "s": "À faire"
     }
   ],
@@ -217,7 +222,12 @@
     "global": false,
     "next": false,
     "timeline": false,
-    "chantiers": [],
+    "chantiers": [
+      "Cadrage",
+      "Indice",
+      "Accès",
+      "Sources"
+    ],
     "hours": false
   },
   "months": [
@@ -275,5 +285,5 @@
     }
   ],
   "calOfficiel": "2026-09-25",
-  "lastVisit": "2026-10-10T08:07:52.020Z"
+  "lastVisit": "2026-10-10T21:44:46.458Z"
 }
