@@ -188,8 +188,8 @@
       "n": 5,
       "t": "Démarche méthodologique",
       "pages": 6,
-      "written": 0,
-      "s": "À faire",
+      "written": 3,
+      "s": "En cours",
       "manual": false
     },
     {
@@ -286,5 +286,5 @@
     }
   ],
   "calOfficiel": "2026-09-25",
-  "lastVisit": "2026-10-10T21:45:41.207Z"
+  "lastVisit": "2026-10-15T07:48:21.061Z"
 }
