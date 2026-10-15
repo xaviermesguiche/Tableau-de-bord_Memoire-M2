@@ -245,21 +245,6 @@
   ],
   "milestones": [
     {
-      "m": 0.15,
-      "t": "Modalités officielles UAIP02 intégrées",
-      "s": "done"
-    },
-    {
-      "m": 0.35,
-      "t": "Vignettes + amorcer Partie I",
-      "s": "prog"
-    },
-    {
-      "m": 1,
-      "t": "Directeur attribué (CNAM)",
-      "s": "key"
-    },
-    {
       "m": 1.95,
       "t": "Choix du sujet (31/10/26 09h59)",
       "s": "crit"
@@ -286,5 +271,5 @@
     }
   ],
   "calOfficiel": "2026-09-25",
-  "lastVisit": "2026-10-15T07:48:21.061Z"
+  "lastVisit": "2026-10-15T07:49:03.140Z"
 }
