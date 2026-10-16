@@ -148,8 +148,29 @@
   ],
   "focus": "Finir démarche méthodo ",
   "hours": {
-    "base": 50,
-    "sessions": []
+    "base": 30,
+    "sessions": [
+      {
+        "date": "01/09",
+        "dur": 5,
+        "note": "Rédaction définition"
+      },
+      {
+        "date": "15/10",
+        "dur": 5,
+        "note": "Rédaction objectifs"
+      },
+      {
+        "date": "01/10",
+        "dur": 10,
+        "note": "Début revue de littérature"
+      },
+      {
+        "date": "15/10",
+        "dur": 15,
+        "note": "Rédaction démarche méthodo"
+      }
+    ]
   },
   "plan": [
     {
@@ -188,8 +209,8 @@
       "n": 5,
       "t": "Démarche méthodologique",
       "pages": 6,
-      "written": 3,
-      "s": "En cours",
+      "written": 6,
+      "s": "Validé",
       "manual": false
     },
     {
@@ -271,5 +292,5 @@
     }
   ],
   "calOfficiel": "2026-09-25",
-  "lastVisit": "2026-10-15T07:49:58.609Z"
+  "lastVisit": "2026-10-16T07:02:25.628Z"
 }
