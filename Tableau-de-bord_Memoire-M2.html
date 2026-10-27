@@ -327,20 +327,12 @@ function ghCfg(){
   try{return JSON.parse(localStorage.getItem("dashboard_github")||"{}");}catch(e){return {};}
 }
 async function saveGithub(reconfig){
-  const cur=ghCfg();
+  const cur=Object.assign({owner:"xaviermesguiche",repo:"Tableau-de-bord_Memoire-M2",path:"suivi-memoire.json",branch:"main"},ghCfg());
   let cfg=cur;
-  if(reconfig||!cur.owner||!cur.repo||!cur.path||!cur.branch||!cur.token){
-    const owner=prompt("Dépôt GitHub — propriétaire (user ou orga)", cur.owner||"");
-    if(!owner)return;
-    const repo=prompt("Nom du dépôt", cur.repo||"");
-    if(!repo)return;
-    const path=prompt("Chemin du fichier dans le dépôt", cur.path||"suivi-memoire.json");
-    if(!path)return;
-    const branch=prompt("Branche", cur.branch||"main");
-    if(!branch)return;
-    const token=prompt("Token GitHub (scope repo, fine-grained : Contents en écriture).\nIl reste dans ce navigateur seulement.", cur.token||"");
+  if(reconfig||!cur.token){
+    const token=prompt("Colle le token GitHub (la chaîne ghp_…). Une seule fois sur cet appareil.", cur.token||"");
     if(!token)return;
-    cfg={owner,repo,path,branch,token};
+    cfg=Object.assign({},cur,{token:token.trim()});
     localStorage.setItem("dashboard_github", JSON.stringify(cfg));
   }
   const data=getJson();
