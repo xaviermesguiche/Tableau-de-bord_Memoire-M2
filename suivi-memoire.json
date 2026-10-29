@@ -238,11 +238,10 @@
     }
   ],
   "next": [
-    "Poursuivre les vignettes discordantes (score-first + re-cotation) jusqu'à ~10 cas.",
-    "Commencer la rédaction de la Partie I — documentaire et juridique, aucun accès requis.",
-    "Sondage choix du sujet : avant le 31/10/26 09h59 (questionnaire mail + Moodle).",
-    "Titre + sommaire notés : avant le 11/12/26 09h59.",
-    "Brouillon structuré (plan détaillé + intention de résultats) : avant le 19/3/27 09h59."
+    "Finir les vignettes",
+    "Mener les 2 entretiens restants",
+    "Commencer la rédaction de la Partie II",
+    "Récupérer dernière version de SALVAC"
   ],
   "hidden": {
     "focus": false,
@@ -297,5 +296,5 @@
     }
   ],
   "calOfficiel": "2026-09-25",
-  "lastVisit": "2026-10-29T08:39:30.371Z"
+  "lastVisit": "2026-10-29T08:54:27.755Z"
 }
