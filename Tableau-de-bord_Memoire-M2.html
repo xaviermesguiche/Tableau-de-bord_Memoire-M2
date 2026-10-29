@@ -179,7 +179,6 @@
     <button class="btn primary" onclick="window.print()">📄 Exporter en PDF</button>
     <button class="btn" onclick="saveGithub(false)">⬆ Enregistrer</button>
     <button class="btn" onclick="loadGithub()">⬇ Recharger</button>
-    <button class="btn" onclick="saveGithub(true)">Token</button>
     <button class="btn" onclick="resetAll()">↺ Réinitialiser</button>
   </div>
   <div class="hintbar">✏️ Double-clique un texte pour le modifier · clique un statut pour le changer · ✕ pour supprimer · « + » pour ajouter · ⬆ GitHub pour enregistrer le suivi</div>
@@ -220,6 +219,7 @@
   <div class="next">
     <h2>▶ Mes prochaines étapes</h2>
     <div class="nextlist" id="nextlist"></div>
+    <button class="addbtn" onclick="addNext()">+ ajouter une étape</button>
   </div>
   <div class="foot">Enregistré automatiquement dans ce navigateur. 🌿</div>
 </div>
@@ -334,6 +334,7 @@ async function saveGithub(reconfig){
     if(!token)return;
     cfg=Object.assign({},cur,{token:token.trim()});
     localStorage.setItem("dashboard_github", JSON.stringify(cfg));
+    alert("Jeton mémorisé sur cet appareil. Les prochains Enregistrer ne le redemandent pas.");
   }
   const data=getJson();
   const url="https://api.github.com/repos/"+cfg.owner+"/"+cfg.repo+"/contents/"+cfg.path.split("/").map(encodeURIComponent).join("/");
@@ -382,7 +383,8 @@ function render(){
   const nl=document.getElementById('nextlist');nl.innerHTML="";
   STATE.next.forEach((txt,i)=>{
     nl.innerHTML+=`<div class="step"><span class="num">${i+1}</span>
-      <span class="steptxt" ondblclick="editNext(this,${i})" title="Double-clique pour modifier">${escapeHtml(txt)}</span></div>`;
+      <span class="steptxt" ondblclick="editNext(this,${i})" title="Double-clique pour modifier">${escapeHtml(txt)}</span>
+      <button class="del" onclick="delNext(${i})" title="Retirer">✕</button></div>`;
   });
 }
 function pagesFor(p){
@@ -511,6 +513,14 @@ function editNext(el,i){
   const r=document.createRange();r.selectNodeContents(el);const sel=getSelection();sel.removeAllRanges();sel.addRange(r);
   const fin=()=>{el.removeAttribute('contenteditable');STATE.next[i]=el.textContent.trim();save();};
   el.onblur=fin;el.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();el.blur();}};
+}
+function addNext(){
+  STATE.next.push("Nouvelle étape");
+  save();render();
+}
+function delNext(i){
+  STATE.next.splice(i,1);
+  save();render();
 }
 function delChantier(g){
   if(confirm("Supprimer le chantier « "+NAMES[g]+" » et toutes ses lignes de l'affichage ?\n\n(↺ Réinitialiser le fera revenir.)")){
